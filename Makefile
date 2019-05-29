@@ -1,14 +1,17 @@
 KSP_MAIN_DIR := ~/Library/Application\ Support/Steam/steamapps/common/Kerbal\ Space\ Program
+KOS_SCRIPT_DIR := ~/Projects/kos-scripts/source
 KSP_SCRIPT_DIR := ${KSP_MAIN_DIR}/Ships/Script
 
 relink:
 	@echo "Linking files into Ships/Script..."
-	@ln -sf ~/Projects/kos-scripts/source/* ${KSP_SCRIPT_DIR}
+	@ln -sf ${KOS_SCRIPT_DIR}/boot ${KSP_SCRIPT_DIR}
+	@ln -sf ${KOS_SCRIPT_DIR}/leolib ${KSP_SCRIPT_DIR}
+	@ln -sf ${KOS_SCRIPT_DIR}/kslib ${KSP_SCRIPT_DIR}
 
-push: guard-FILE guard-TARGET
+push: guard-ACTION guard-TARGET
 	@make relink
-	@echo "Pushing ${FILE} to vessel(s) ${TARGET}..."
-	@cp ${FILE} ${KSP_SCRIPT_DIR}/${TARGET}-update.ks
+	@echo "Pushing ${ACTION} to vessel(s) ${TARGET}..."
+	@cp ${KOS_SCRIPT_DIR}/actions/${ACTION}.ks ${KSP_SCRIPT_DIR}/${TARGET}-update.ks
 
 guard-%:
 	@if [ "${${*}}" = "" ]; then \
