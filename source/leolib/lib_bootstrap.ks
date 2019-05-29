@@ -16,7 +16,7 @@ if has_file("identity.json", 1) {
   set intMax to 2147483647. // 0x7FFFFFFF (32-bit signed)
 
   set sid to lexicon(
-    "uuid", mod(round(random(), 10) * (10 ^ 10), intMax),
+    "uuid", round(mod(round(random(), 10) * (10 ^ 10), intMax), 0),
     "guid", 0,
     "name", ship:name
   ).
