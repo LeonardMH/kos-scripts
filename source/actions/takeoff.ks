@@ -1,47 +1,6 @@
-function is_clamped_to_ground {
-  parameter clampName is "launchClamp".
-  parameter vessel is ship.
-
-  set clampList to vessel:partsnamedpattern(clampName).
-
-  return clampList:length > 0.
-}
-
-function notify_countdown {
-  parameter startFrom is 3.
-
-  from {local countdown is startFrom.} until countdown = 0 step {set countdown to countdown - 1.} do {
-    notify("T-" + countdown).
-    wait 1.
-  }
-}
-
-// set inital throttle and directional controls
-set mySteer to heading(90, 90).
-set myThrottle to 1.0.
-
-lock steering to mySteer.
-lock throttle to myThrottle.
-
-// countdown loop running from 3 to 0
-clearscreen.
-notify_countdown(3).
-
-// if initial stage is engine held by support structure, immediately stage it 
-// away, the launch engine should be staged first otherwise the clamps will release
-// the ship onto the ground possibly breaking the engines.
-if is_clamped_to_ground() {
-  notify("Staging through launch clamps...").
-  stage. wait 0.6. stage.
-} 
-
-// normal staging logic
-when maxthrust = 0 then {
-  notify("Moving to next stage...").
-  stage. wait 0.6.
-  preserve.
-}
-
+// ----------------------------------------------------------------------------
+// functions
+// ----------------------------------------------------------------------------
 function get_throttle_for_twr {
   parameter targetTWR.
   parameter vessel is ship.
@@ -80,9 +39,65 @@ function get_steering_for_state {
   return 0.
 }
 
-clearscreen.
-until ship:apoapsis > 90000 {
+function is_clamped_to_ground {
+  parameter clampName is "launchClamp".
+  parameter vessel is ship.
+
+  return vessel:partsnamedpattern(clampName):length > 0.
+}
+
+function get_payload_fairings {
+  parameter vessel is ship.
+
+  return vessel:partsnamedpattern("fairing").
+}
+
+// ----------------------------------------------------------------------------
+// begin script
+// ----------------------------------------------------------------------------
+set TARGET_AP to 90000.
+
+// set inital throttle and directional controls
+set mySteer to heading(90, 90).
+set myThrot to 1.0.
+
+lock steering to mySteer.
+lock throttle to myThrot.
+
+// if initial stage is engine held by support structure, immediately stage it 
+// away, the launch engine should be staged first otherwise the clamps will release
+// the ship onto the ground possibly breaking the engines.
+if is_clamped_to_ground() {
+  notify("Staging through launch clamps...").
+  stage. wait until stage:ready. stage.
+}
+
+// normal staging logic
+when maxthrust = 0 then {
+  notify("Staging...").
+  stage. wait until stage:ready.
+  preserve.
+}
+
+// discard payload shell when leaving the atmosphere (if it exists)
+set fars to get_payload_fairings().
+if fars:length > 0 {
+  when ship:altitude > 70000 then {
+    notify("Ejecting payload fairings...").
+
+    lock steering to "kill".
+
+    for far in fars {
+      far:getmodule("ModuleProceduralFairing"):doevent("deploy").
+    }
+
+    lock steering to mySteer.
+  }
+}
+
+until ship:apoapsis >= TARGET_AP {
   set potentialSteering to get_steering_for_state(ship).
+
   if potentialSteering = 0 {
     unlock steering.
   } else {
@@ -92,14 +107,10 @@ until ship:apoapsis > 90000 {
   // above a certain altitude there is no compelling reason to keep thrust TWR
   // limited, pin it
   if ship:altitude > 26000 {
-    set myThrottle to 1.0.
+    set myThrot to 1.0.
   } else {
-    set myThrottle to get_throttle_for_twr(1.9).
+    set myThrot to get_throttle_for_twr(1.9).
   }
-
-  print "PITCH: " + mySteer at (0, 15).
-  print "AP: " + round(ship:apoapsis, 0) at (0, 16).
-  print "Q: " + ship:q at (0, 17).
 }
 
 notify("Target AP reached, returning control...").
