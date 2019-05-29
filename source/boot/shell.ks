@@ -3,11 +3,12 @@
 // opening the terminal
 //
 
-if not (defined _LOADED_BOOTSTRAP) and addons:rt:hasconnection(ship) {
+if addons:rt:hasconnection(ship) and not volume(1):exists("lib_bootstrap") {
   copypath("0:/leolib/lib_bootstrap", "").
   compile lib_bootstrap. deletepath("1:/lib_bootstrap.ks").
-  runoncepath("1:/lib_bootstrap").
 }
+
+runpath("1:/lib_bootstrap").
 
 // automatically open the terminal window
 clearscreen.
