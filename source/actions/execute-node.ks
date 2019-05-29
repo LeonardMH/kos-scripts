@@ -82,4 +82,7 @@ remove nd.
 
 notify("Node executed, returning control...").
 lock throttle to 0. set ship:control:pilotmainthrottle to 0.
-reboot.
+
+if not (defined _EXECUTING_GUI_BOOTLOADER) {
+  reboot.
+}

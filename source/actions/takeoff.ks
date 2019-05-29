@@ -104,4 +104,7 @@ until ship:apoapsis > 90000 {
 
 notify("Target AP reached, returning control...").
 lock throttle to 0. set ship:control:pilotmainthrottle to 0.
-reboot.
+
+if not (defined _EXECUTING_GUI_BOOTLOADER) {
+  reboot.
+}
