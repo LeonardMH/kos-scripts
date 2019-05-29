@@ -5,6 +5,7 @@ KSP_SCRIPT_DIR := ${KSP_MAIN_DIR}/Ships/Script
 relink:
 	@echo "Linking files into Ships/Script..."
 	@ln -sf ${KOS_SCRIPT_DIR}/boot ${KSP_SCRIPT_DIR}
+	@ln -sf ${KOS_SCRIPT_DIR}/actions ${KSP_SCRIPT_DIR}
 	@ln -sf ${KOS_SCRIPT_DIR}/leolib ${KSP_SCRIPT_DIR}
 	@ln -sf ${KOS_SCRIPT_DIR}/kslib ${KSP_SCRIPT_DIR}
 
