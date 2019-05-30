@@ -11,12 +11,58 @@ PYTHON := python3
 telnet:
 	@telnet localhost 5410
 
+minify-all:
+	@echo "Minifying all source files..."
+	@${PYTHON} ksmin.py --nuke --all-files
+
+	@echo "Before minification..."
+	@wc -c source/**/*.ks
+
+	@echo "\n----\n"
+
+	@echo "After minification..."
+	@wc -c minified/**/*.ks
+
+	@make link
+
+minify-all-safe:
+	@echo "Minifying all source files safely..."
+	@${PYTHON} ksmin.py --nuke --safe --all-files
+
+	@echo "Before minification..."
+	@wc -c source/**/*.ks
+
+	@echo "\n----\n"
+
+	@echo "After minification..."
+	@wc -c minified/**/*.ks
+
+	@make link
+
+minify-single-file: guard-FILE
+	@${PYTHON} ksmin.py --nuke
+	@echo "Copying all source files as is to minified..."
+	@cp -r ${KOS_SOURCE_DIR}/* ${KOS_MINIFY_DIR}
+
+	@echo "Minifying only ${FILE}..."
+	@${PYTHON} ksmin.py --safe --single-file ./source/${FILE}
+
+	@echo "Before minification..."
+	@wc -c ./source/${FILE}
+
+	@echo "\n----\n"
+
+	@echo "After minification..."
+	@wc -c ./minified/${FILE}
+
+	@make link
+
 link:
-	@echo "Linking files into Ships/Script..."
-	@ln -sf ${KOS_SCRIPT_DIR}/boot ${KSP_SCRIPT_DIR}
-	@ln -sf ${KOS_SCRIPT_DIR}/actions ${KSP_SCRIPT_DIR}
-	@ln -sf ${KOS_SCRIPT_DIR}/leolib ${KSP_SCRIPT_DIR}
-	@ln -sf ${KOS_SCRIPT_DIR}/kslib ${KSP_SCRIPT_DIR}
+	@echo "Linking minified files into Ships/Script..."
+	@ln -sf ${KOS_MINIFY_DIR}/boot ${KSP_SCRIPT_DIR}
+	@ln -sf ${KOS_MINIFY_DIR}/actions ${KSP_SCRIPT_DIR}
+	@ln -sf ${KOS_MINIFY_DIR}/leolib ${KSP_SCRIPT_DIR}
+	@ln -sf ${KOS_MINIFY_DIR}/kslib ${KSP_SCRIPT_DIR}
 
 push-action: guard-ACTION guard-TARGET
 	@make link
