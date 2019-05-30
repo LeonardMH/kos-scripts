@@ -1,6 +1,6 @@
 # kos-scripts
 
-My scripts (and supporting tools) for the Kerbal Space Program mod kOS (Kerbal Operating System).
+My scripts and supporting tools for the Kerbal Space Program (KSP) mod Kerbal Operating System (kOS).
 
 - [Kerbal Space Program on Steam](https://store.steampowered.com/app/220200/Kerbal_Space_Program/)
 - [kOS Documentation](https://ksp-kos.github.io/KOS/)
