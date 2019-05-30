@@ -30,7 +30,7 @@ function get_throttle_for_twr {
 
 function get_steering_for_state {
   parameter vessel is ship.
-  
+
   set v to vessel:velocity:surface:mag.
   set h to vessel:altitude.
 
@@ -44,10 +44,8 @@ function get_steering_for_state {
     return heading(90, 45).
   } else if v >= 1000 and v < 1400 {
     return heading(90, 30).
-  } else if v >= 1400 or h < 32000 {
+  } else if v >= 1400 {
     return heading(90, 25).
-  } else if h > 32000 {
-    return heading(90, 10).
   }
 
   // unlock the steering controls
@@ -79,7 +77,7 @@ set myThrot to 1.0.
 lock steering to mySteer.
 lock throttle to myThrot.
 
-// if initial stage is engine held by support structure, immediately stage it 
+// if initial stage is engine held by support structure, immediately stage it
 // away, the launch engine should be staged first otherwise the clamps will release
 // the ship onto the ground possibly breaking the engines.
 if is_clamped_to_ground() {
