@@ -9,10 +9,15 @@ link:
 	@ln -sf ${KOS_SCRIPT_DIR}/leolib ${KSP_SCRIPT_DIR}
 	@ln -sf ${KOS_SCRIPT_DIR}/kslib ${KSP_SCRIPT_DIR}
 
-push: guard-ACTION guard-TARGET
+push-action: guard-ACTION guard-TARGET
 	@make link
 	@echo "Pushing ${ACTION} to vessel(s) ${TARGET}..."
 	@cp ${KOS_SCRIPT_DIR}/actions/${ACTION}.ks ${KSP_SCRIPT_DIR}/${TARGET}-update.ks
+
+push-mission: guard-MISSION guard-TARGET
+	@make link
+	@echo "Pushing ${MISSION} to vessel(s) ${TARGET}..."
+	@cp ${KOS_SCRIPT_DIR}/missions/${MISSION}.ks ${KSP_SCRIPT_DIR}/${TARGET}-update.ks
 
 guard-%:
 	@if [ "${${*}}" = "" ]; then \

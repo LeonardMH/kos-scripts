@@ -30,9 +30,9 @@ until false {
   if addons:rt:hasconnection(ship) {
     notify("Checking for updates...").
 
-    try_execute_update("uuid:" + sid["uuid"] + "-update.ks", true).
-    try_execute_update("name:" + sid["name"] + "-update.ks", true).
-    try_execute_update("guid:" + sid["guid"] + "-update.ks", false).
+    try_execute_update("uuid-" + sid["uuid"] + "-update.ks", true).
+    try_execute_update("name-" + sid["name"] + "-update.ks", true).
+    try_execute_update("guid-" + sid["guid"] + "-update.ks", false).
 
     wait 1.
   }
