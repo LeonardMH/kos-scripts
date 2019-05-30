@@ -1,20 +1,31 @@
 // ----------------------------------------------------------------------------
 // functions
 // ----------------------------------------------------------------------------
+function gravitational_acceleration {
+  // vessel to calculate this for (defaults to active ship)
+  parameter ves is ship.
+
+  // orbital body to calculate in relation to (defaults to body the selected
+  // vessel is currently orbiting)
+  parameter orb is ves:body.
+
+  set radius to orb:radius + orb:altitudeof(ves:position).
+  return orb:mu / (radius ^ 2).
+}
+
 function get_throttle_for_twr {
   parameter targetTWR.
-  parameter vessel is ship.
+  parameter ves is ship.
 
-  // TODO: Calculate proper gravity for planetary body
-  set g to 9.81.
+  set g to gravitational_acceleration().
 
   // if we haven't yet staged through to a thrust producing stage, keep the
   // throttle pinned
-  if vessel:availablethrust = 0 {
+  if ves:availablethrust = 0 {
     return 1.0.
   }
 
-  return targetTWR * vessel:mass * g / vessel:availablethrust.
+  return targetTWR * ves:mass * g / ves:availablethrust.
 }
 
 function get_steering_for_state {
@@ -31,8 +42,12 @@ function get_steering_for_state {
     return heading(90, 75).
   } else if v >= 600 and v < 1000 {
     return heading(90, 45).
-  } else if v > 1000 and h > 26000 {
+  } else if v >= 1000 and v < 1400 {
     return heading(90, 30).
+  } else if v >= 1400 or h < 32000 {
+    return heading(90, 25).
+  } else if h > 32000 {
+    return heading(90, 10).
   }
 
   // unlock the steering controls
