@@ -1,6 +1,15 @@
 KSP_MAIN_DIR := ~/Library/Application\ Support/Steam/steamapps/common/Kerbal\ Space\ Program
-KOS_SCRIPT_DIR := ~/Projects/kos-scripts/source
 KSP_SCRIPT_DIR := ${KSP_MAIN_DIR}/Ships/Script
+
+KOS_SCRIPT_BASEDIR := ~/Projects/kos-scripts
+KOS_SOURCE_DIR := ${KOS_SCRIPT_BASEDIR}/source
+KOS_MINIFY_DIR := ${KOS_SCRIPT_BASEDIR}/minified
+KOS_SCRIPT_DIR := ${KOS_MINIFY_DIR}
+
+PYTHON := python3
+
+telnet:
+	@telnet localhost 5410
 
 link:
 	@echo "Linking files into Ships/Script..."
