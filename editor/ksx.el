@@ -48,17 +48,17 @@
   "List of Kerboscript keywords for ksx-mode.")
 
 (defvar ksx-types
-  (list  "sas" "steering" "throttle")
+  (list  "sas" "steering" "throttle" "gear" "legs" "chutes" "lights" "panels" "brakes" "abort" "ag")
   "List of special Kerboscript types for ksx-mode.")
 
-(defvar ksx-functions
+(defvar ksx-builtins
   (list "abs" "arccos" "arcsin" "arctan" "arctan2" "ceiling" "constant" "cos"
         "floor" "heading" "ln" "log10" "max" "min" "mod" "node" "random" "round"
         "sin" "sort" "tan")
   "List of Kerboscript built-in functions for ksx-mode.")
 
 (defvar ksx-constants
-  (list "false" "true")
+  (list "false" "true" "red" "green" "blue" "yellow" "cyan" "magenta" "purple" "white" "black")
   "List of Kerboscript constants for ksx-mode.")
 
 (let
@@ -132,7 +132,7 @@
   `(( "\\(@lazyglobal\\|@import\\|@from\\|import\\)" . (1 font-lock-warning-face))
     ( "function \\([^ ]*\\)"          . (1 font-lock-function-name-face))
     ( "\\(\\(\\sw\\|\\s_\\)*\\)("     . (1 font-lock-function-name-face))
-    ( ,(ksx-regexp-opt ksx-functions) . font-lock-builtin-face)
+    ( ,(ksx-regexp-opt ksx-builtins)  . font-lock-builtin-face)
     ( ,(ksx-regexp-opt ksx-keywords)  . font-lock-keyword-face)
     ( ,(ksx-regexp-opt ksx-variables) . font-lock-variable-name-face)
     ( ,(ksx-regexp-opt ksx-types)     . font-lock-type-face)
