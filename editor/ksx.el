@@ -63,7 +63,17 @@
   "List of Kerboscript constants for ksx-mode.")
 
 (let
-    ((orbit-suffixes
+    ((top-level-suffixable (list "addons"))
+     (addons-suffixes (list "rt" "kac"))
+     (addons-rt-suffixes
+      (list "available" "delay" "kscdelay" "antennahasconnection"
+            "hasconnection" "haskscconnection" "haslocalcontrol"
+            "groundstations"))
+     (addons-kac-suffixes (list "available" "alarms"))
+     (addons-kac-alarms-suffixes
+      (list "id" "name" "action" "type" "notes" "remaining" "repeat"
+            "repeatperiod" "originbody" "targetbody"))
+     (orbit-suffixes
       (list "apoapsis" "argumentofperiapsis" "body" "eccentricity"
             "hasnextpatch" "inclination" "lan"
             "longitudeofascendingnode" "meananomalyatepoch" "name"
@@ -101,12 +111,18 @@
       (list "x" "y" "z" "mag" "normalized" "sqrmagnitude" "direaction" "vec"))
      )
   (defvar ksx-variables
-    (delete-dups (append orbit-suffixes
-                         orbitable-suffixes
-                         orbitable-velocity-suffixes
-                         vessel-suffixes
-                         vessel-control-suffixes
-                         vector-suffixes))
+    (delete-dups (append
+                  top-level-suffixable
+                  addons-suffixes
+                  addons-rt-suffixes
+                  addons-kac-suffixes
+                  addons-kac-alarms-suffixes
+                  orbit-suffixes
+                  orbitable-suffixes
+                  orbitable-velocity-suffixes
+                  vessel-suffixes
+                  vessel-control-suffixes
+                  vector-suffixes))
     "List of known Kerboscript variables and structure suffixes for ksx-mode."))
 
 (defun ksx-regexp-opt (keywords)
