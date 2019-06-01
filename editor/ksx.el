@@ -77,10 +77,36 @@
             "position" "prograde" "retrograde" "ship" "srfprograde"
             "srfretrograde" "the" "up" "velocity"))
      (orbitable-velocity-suffixes
-      (list "orbit" "surface")))
+      (list "orbit" "surface"))
+     (vessel-suffixes
+      (list
+       "control" "bearing" "heading" "maxthrust" "maxthrustat" "availablethrust"
+       "availablethrustat" "facing" "mass" "wetmass" "drymass" "dynamicpressure"
+       "q" "verticalspeed" "groundspeed" "airspeed" "termvelocity" "shipname"
+       "name" "status" "type" "starttracking" "angularmomentum" "angularvel"
+       "sensors" "loaded" "unpacked" "loaddistance" "isdead" "patches"
+       "rootpart" "controlpart" "parts" "dockingports" "elements" "resources"
+       "partsnamed" "partsnamedpattern" "partstitled" "partstitledpattern"
+       "partsstagged" "partsstaggedpattern" "partsdubbed" "partsdubbedpattern"
+       "modulesnamed" "partsingroup" "modulesingroup" "allpartstagged"
+       "crewcapacity" "crew" "connection" "messages"))
+     (vessel-control-suffixes
+      (list
+       "pilotmainthrottle" "pilotyaw" "pilotpitch" "pilotroll" "pilotrotation"
+       "pilotyawtrim" "pilotpitchtrim" "pilotrolltrim" "pilotfore"
+       "pilotstarboard" "pilottop" "pilottranslation" "pilotwheelsteer"
+       "pilotwheelthrottle" "pilotwheelsteertrim" "pilotwheelthrottletrim"
+       "pilotneutral"))
+     (vector-suffixes
+      (list "x" "y" "z" "mag" "normalized" "sqrmagnitude" "direaction" "vec"))
+     )
   (defvar ksx-variables
-    (delete-dups (append orbit-suffixes orbitable-suffixes
-                         orbitable-velocity-suffixes))
+    (delete-dups (append orbit-suffixes
+                         orbitable-suffixes
+                         orbitable-velocity-suffixes
+                         vessel-suffixes
+                         vessel-control-suffixes
+                         vector-suffixes))
     "List of known Kerboscript variables and structure suffixes for ksx-mode."))
 
 (defun ksx-regexp-opt (keywords)
