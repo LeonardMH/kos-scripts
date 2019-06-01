@@ -88,8 +88,9 @@
   (regexp-opt keywords 'symbols))
 
 (defvar ksx-font-locks
-  `(( "function \\([^ ]*\\)"        . (1 font-lock-function-name-face))
-    ( "@lazyglobal off"             . font-lock-warning-face)
+  `(( "@lazyglobal off"               . font-lock-warning-face)
+    ( "function \\([^ ]*\\)"          . (1 font-lock-function-name-face))
+    ( "\\(\\(\\sw\\|\\s_\\)*\\)("     . (1 font-lock-function-name-face))
     ( ,(ksx-regexp-opt ksx-functions) . font-lock-builtin-face)
     ( ,(ksx-regexp-opt ksx-keywords)  . font-lock-keyword-face)
     ( ,(ksx-regexp-opt ksx-variables) . font-lock-variable-name-face)
