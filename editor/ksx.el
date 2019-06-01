@@ -21,11 +21,27 @@
     keymap)
   "Keymap for ksx-mode.")
 
+; These are the listed constants at: https://ksp-kos.github.io/KOS/language/syntax.html
+; but there clearly seem to be some missing keywords here, so idk..
+;
+; >
+; add all at batch break clearscreen compile copy declare delete
+; deploy do do edit else file for from from function global if
+; in list local lock log off on once parameter preserve print reboot
+; remove rename run set shutdown stage step switch then to toggle
+; unlock unset until volume wait when
+; >
+;
+; These are the listed boolean operators:
+;
+; >
+; not  and  or  true  false
+; >
 (defvar ksx-keywords
   (list "add" "all" "and" "at" "batch" "break" "cd" "clearscreen" "compile"
         "copy" "copypath" "create" "createdir" "declare" "delete" "deletepath"
         "deploy" "do" "edit" "else" "eta" "exists" "file" "for" "from" "function"
-        "global" "heading" "if" "in" "is" "list" "local" "lock" "log" "movepath"
+        "global" "if" "in" "is" "list" "local" "lock" "log" "movepath"
         "not" "off" "or" "on" "open" "parameter" "preserve" "print" "readjson"
         "reboot" "remove" "rename" "return" "run" "set" "shutdown" "stage"
         "step" "switch" "then" "to" "toggle" "unlock" "unset" "until" "volume"
@@ -37,9 +53,9 @@
   "List of special Kerboscript types for ksx-mode.")
 
 (defvar ksx-functions
-  (list "abs" "arccos" "arcsin" "arctan" "arctan2" "ceiling"
-        "constant" "cos" "floor" "ln" "log10" "max" "min" "mod"
-        "node" "random" "round" "sin" "sort" "tan")
+  (list "abs" "arccos" "arcsin" "arctan" "arctan2" "ceiling" "constant" "cos"
+        "floor" "heading" "ln" "log10" "max" "min" "mod" "node" "random" "round"
+        "sin" "sort" "tan")
   "List of Kerboscript built-in functions for ksx-mode.")
 
 (defvar ksx-constants
