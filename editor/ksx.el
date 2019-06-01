@@ -354,6 +354,12 @@
   (let ((fill-prefix nil)) (forward-paragraph arg)))
 ; END Fill handling!!!
 
+(defun ksx-mode-reload ()
+  (interactive)
+  (unload-feature 'ksx)
+  (require 'ksx)
+  (ksx-mode))
+
 ;;;###autoload
 (define-derived-mode ksx-mode prog-mode "KerboScript Extended"
   "A major mode for editing Kerboscript files."
