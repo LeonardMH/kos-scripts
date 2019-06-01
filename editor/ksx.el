@@ -194,7 +194,7 @@
                    (funcall indent-less)))))
     (indent-line-to (max indentation 0))))
 
-(define-derived-mode ksx-mode fundamental-mode "ksx"
+(define-derived-mode ksx-mode prog-mode "ksx"
   "A major mode for editing Kerboscript files."
   :syntax-table ksx-mode-syntax-table
   (setq-local font-lock-defaults '(ksx-font-locks nil t))
