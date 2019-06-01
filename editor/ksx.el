@@ -5,7 +5,6 @@
 ;; This is derived directly from ks.el in the jarpy/ks-mode repo:
 ;; https://github.com/jarpy/ks-mode
 
-
 (if (featurep 'ksx) (unload-feature 'ksx))
 
 (defvar ksx-mode-syntax-table
@@ -380,8 +379,7 @@
   (setq-local font-lock-defaults '(ksx-font-locks nil t))
   (setq-local indent-line-function 'ksx-indent-line))
 
-(add-to-list 'auto-mode-alist '("\\.ks\\'" . ksx-mode))
-(add-to-list 'auto-mode-alist '("\\.ksx\\'" . ksx-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(ks\\|ksx\\)\\'" . ksx-mode))
 
 (provide 'ksx)
 ;;; ksx.el ends here
