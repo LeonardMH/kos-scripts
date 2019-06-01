@@ -198,8 +198,7 @@
   "A major mode for editing Kerboscript files."
   :syntax-table ksx-mode-syntax-table
   (setq-local font-lock-defaults '(ksx-font-locks nil t))
-  (setq-local indent-line-function 'ksx-indent-line)
-  (if (featurep 'rainbow-delimiters) (rainbow-delimiters-mode-enable)))
+  (setq-local indent-line-function 'ksx-indent-line))
 
 (add-to-list 'auto-mode-alist '("\\.ks\\'" . ksx-mode))
 (add-to-list 'auto-mode-alist '("\\.ksx\\'" . ksx-mode))
