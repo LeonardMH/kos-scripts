@@ -128,13 +128,19 @@
   "Make an optimized regexp from the list of KEYWORDS."
   (regexp-opt keywords 'symbols))
 
+(defun ksx-regexp-opt-nomember (keywords)
+  "Compile a regex matching any of KEYWORDS with no leading colon."
+  (concat "\\(?:^\\|[^:]\\)" (ksx-regexp-opt keywords)))
+
 (defvar ksx-font-locks
   `(( "\\(@lazyglobal\\|@import\\|@from\\|import\\)" . (1 font-lock-warning-face))
     ( "function \\([^ ]*\\)"          . (1 font-lock-function-name-face))
-    ( "\\(\\(\\sw\\|\\s_\\)*\\)("     . (1 font-lock-function-name-face))
-    ( ,(ksx-regexp-opt ksx-builtins)  . font-lock-builtin-face)
-    ( ,(ksx-regexp-opt ksx-keywords)  . font-lock-keyword-face)
-    ( ,(ksx-regexp-opt ksx-variables) . font-lock-variable-name-face)
+    ( "\\b[[:digit:].]+\\(e[+-]?[:digit:]+\\)?\\b" . font-lock-constant-face)
+    ; Uncomment to highlight function calls
+    ; ( "\\(\\(\\sw\\|\\s_\\)*\\)("     . (1 font-lock-function-name-face))
+    ( ,(ksx-regexp-opt-nomember ksx-builtins)  . font-lock-builtin-face)
+    ( ,(ksx-regexp-opt-nomember ksx-keywords)  . font-lock-keyword-face)
+    ( ,(ksx-regexp-opt-nomember ksx-variables) . font-lock-variable-name-face)
     ( ,(ksx-regexp-opt ksx-types)     . font-lock-type-face)
     ( ,(ksx-regexp-opt ksx-constants) . font-lock-constant-face)))
 
