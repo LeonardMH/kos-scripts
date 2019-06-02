@@ -28,6 +28,13 @@ report-size-single-file: guard-FILE
 	@echo "After minification..."
 	@wc -c ./minified/${FILE}
 
+transpile-only-all:
+	@echo "Transpiling all source files, no optimizations..."
+	@${PYTHON} ksx.py --nuke --transpile-only --all-files
+
+	@make report-size
+	@make link
+
 compile-all:
 	@echo "Compiling all source files..."
 	@${PYTHON} ksx.py --nuke --all-files
