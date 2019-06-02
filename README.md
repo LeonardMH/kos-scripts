@@ -160,7 +160,8 @@ been improved in several ways since forking. It supports:
 KerboScript Extended is and always will be a strict superset of KerboScript so
 you can use this mode for pure KerboScript as well. If you would like to do so,
 you can download the [editor/ksx.el][ksx-el-blob] file, place it on your machine
-somewhere (this example assumes `/emacs-custom/`) then do the following:
+somewhere (this example assumes `/emacs-custom/`) then add the following to your
+`init.el`:
 
 ```elisp
 (add-to-list 'load-path "~/emacs-custom/ksx.el")
