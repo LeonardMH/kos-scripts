@@ -121,20 +121,6 @@ def ensure_space_after_certain_statements(file_oneline):
     pass
 
 
-# this also defines the order in which actions are applied
-_LINEWISE_MINIFIER_ACTIONS = [
-    min_strip_comments,
-    min_remove_whitespace,
-    min_remove_blank_lines,
-    ksx_remove_lines,
-]
-
-
-_ONELINE_MINIFIER_ACTIONS = [
-    min_remove_useless_space,
-]
-
-
 def walkpath_with_action(path, action):
     from os import walk
 
@@ -188,7 +174,7 @@ def nuke_minified_directory():
     walkpath_with_action("./minified/", remove_if_not_whitelisted)
 
 
-def compile_single_file(file_path):
+def compile_single_file(file_path, minifier_actions, transpile_only=False, safe_only=True):
     import os
     import shutil
 
@@ -204,17 +190,26 @@ def compile_single_file(file_path):
     with open(file_path, 'r') as rf:
         file_lines = rf.readlines()
 
-    for action_function in _LINEWISE_MINIFIER_ACTIONS:
+    def allowed_filter(func, tags):
+        return not (
+            (safe_only and "safe" not in tags) or
+            (transpile_only and "transpile-only" not in tags))
+
+    allowed_actions = {
+        k: [x for x in v if allowed_filter(*x)]
+        for (k, v) in minifier_actions.items()
+    }
+
+    for action_function, action_tags in allowed_actions["linewise"]:
         file_lines = action_function(file_lines)
 
     file_oneline = min_squash_to_oneline(file_lines)
 
-    for action_function in _ONELINE_MINIFIER_ACTIONS:
+    for action_function, action_tags in minifier_actions["oneline"]:
         file_oneline = action_function(file_oneline)
 
     with open(dest_path, 'w') as wf:
         wf.write(file_oneline)
-
 
 if __name__ == '__main__':
     import argparse
@@ -223,6 +218,10 @@ if __name__ == '__main__':
     parser.add_argument("--nuke",
                         action='store_true',
                         help="Clean out the 'minified' directory")
+
+    parser.add_argument("--transpile-only",
+                        action="store_true",
+                        help="Only perform transpilation from .ks to .ksx, no further optimizations")
 
     parser.add_argument("--safe",
                         action='store_true',
@@ -239,16 +238,20 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    transpiler_actions = {
+        "oneline": [
+            [min_remove_useless_space, []]
+        ],
+        "linewise": [
+            [min_strip_comments, ["safe"]],
+            [min_remove_blank_lines, ["safe"]],
+            [min_remove_whitespace, []],
+            [ksx_remove_lines, ["transpile-only", "safe"]]
+        ],
+    }
+
     if args.nuke:
         nuke_minified_directory()
-
-    if args.safe:
-        _ONELINE_MINIFIER_ACTIONS = []
-        _LINEWISE_MINIFIER_ACTIONS = [
-            min_strip_comments,
-            min_remove_blank_lines,
-            ksx_remove_lines,
-        ]
 
     if args.single_file:
         files_to_compile = [args.single_file]
@@ -256,4 +259,9 @@ if __name__ == '__main__':
         files_to_compile = find_all_ks_files("./source/")
 
     for single_file in files_to_compile:
-        compile_single_file(single_file)
+        compile_single_file(
+            single_file,
+            transpiler_actions,
+            transpile_only=args.transpile_only,
+            safe_only=args.safe,
+        )
