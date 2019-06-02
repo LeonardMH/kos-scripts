@@ -140,7 +140,7 @@ editing KerboScript. It actually is intended to support some language extensions
 I want to add and am referring to as KerboScript Extended, hence the name
 ksx-mode.
 
-![ksx-mode screenshot](images/ksx-mode-current.png)
+![ksx-mode screenshot](images/ksx-mode-06012019.png)
 *Spacemacs with [gruvbox theme][gruvbox-theme] and [Fira Code font][fira-code]* 
 
 This mode was originally derived from [jarpy/kos-mode][jarpy-kos-mode] but has
@@ -171,7 +171,7 @@ somewhere (this example assumes `/emacs-custom/`) then do the following:
 
 The screenshot shown above is highlighting the following code block.
 
-```kerboscript
+```
 function test_language_features {
   parameter vessel is ship.
 
