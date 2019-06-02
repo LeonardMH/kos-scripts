@@ -198,6 +198,6 @@ function test_language_features {
 [kerbal-space-programming]: https://www.youtube.com/watch?v=fNlAME5eU3o&list=PLb6UbFXBdbCrvdXVgY_3jp5swtvW24fYv
 [doc-compile-ksm]: https://ksp-kos.github.io/KOS/general/compiling.html
 [jarpy-kos-mode]: https://github.com/jarpy/ks-mode
-[ksx-el-blob]: https://github.com/leonardmh/kos-scripts/blob/master/editor/ksx.el
+[ksx-el-blob]: https://github.com/leonardmh/kos-scripts/raw/master/editor/ksx.el
 [gruvbox-theme]: https://github.com/greduan/emacs-theme-gruvbox 
 [fira-code]: https://github.com/tonsky/FiraCode 
