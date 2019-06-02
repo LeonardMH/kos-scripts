@@ -133,5 +133,71 @@ ok for now.
 **TODO**: I will document this at some point, but I am considering an overhaul
 to this whole system pretty soon so I don't want to do that just now.
 
+## Emacs Major Mode (ksx-mode)
+
+This repository (under the `editor`) folder contains an emacs major mode for
+editing KerboScript. It actually is intended to support some language extensions
+I want to add and am referring to as KerboScript Extended, hence the name
+ksx-mode.
+
+![ksx-mode screenshot](images/ksx-mode-current.png)
+*Spacemacs with [gruvbox theme][gruvbox-theme] and [Fira Code font][fira-code]* 
+
+This mode was originally derived from [jarpy/kos-mode][jarpy-kos-mode] but has
+been improved in several ways since forking. It supports:
+
+- Highlighting for KerboScript keywords, built-in functions, constants, and numbers.
+  - Derived from kos-mode, but extended
+- Highlighting for known object suffixes such as `SHIP:VELOCITY:ORBIT`.
+  - Derived from kos-mode, but extended
+- Powerful and automatic indentation. Try `ks-indent-buffer`.
+  - Derived from kos-mode, extended to enable autopairing of braces and
+    parentheses (by deriving from prog-mode instead of fundamental mode)
+- Proper comment wrapping (`fill-region`, `fill-paragraph`, etc.) for long comments.
+
+### Installation
+
+KerboScript Extended is and always will be a strict superset of KerboScript so
+you can use this mode for pure KerboScript as well. If you would like to do so,
+you can download the [editor/ksx.el][ksx-el-blob] file, place it on your machine
+somewhere (this example assumes `/emacs-custom/`) then do the following:
+
+```elisp
+(add-to-list 'load-path "~/emacs-custom/ksx.el")
+(require 'ksx)
+```
+
+### Screenshot Highlighting Code
+
+The screenshot shown above is highlighting the following code block.
+
+```kerboscript
+function test_language_features {
+  parameter vessel is ship.
+
+  // get shortcut variables to vessel velocity and altitude
+  set v to vessel:velocity:surface:mag.
+  set h to vessel:altitude.
+
+  // always be moving
+  if v < 0.1 {
+    stage.
+  }
+
+  // if vessel has reached target altitude, reboot and allow bootloader to
+  // decide next action
+  if h > 80000 {
+    reboot.
+  }
+
+  set steering to heading(90, get_pitch_for_state()).
+  set throttle to get_throttle_for_twr(1.9).
+}
+```
+
 [kerbal-space-programming]: https://www.youtube.com/watch?v=fNlAME5eU3o&list=PLb6UbFXBdbCrvdXVgY_3jp5swtvW24fYv
 [doc-compile-ksm]: https://ksp-kos.github.io/KOS/general/compiling.html
+[jarpy-kos-mode]: https://github.com/jarpy/ks-mode
+[ksx-el-blob]: https://github.com/leonardmh/kos-scripts/blob/master/editor/ksx.el
+[gruvbox-theme]: https://github.com/greduan/emacs-theme-gruvbox 
+[fira-code]: https://github.com/tonsky/FiraCode 
