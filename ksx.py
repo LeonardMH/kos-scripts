@@ -208,33 +208,37 @@ def compile_single_file(file_path, minifier_actions, transpile_only=False, safe_
     with open(dest_path, 'w') as wf:
         wf.write(file_oneline)
 
-if __name__ == '__main__':
+def main_generate_parser():
     import argparse
 
     parser = argparse.ArgumentParser("ksx: KerboScript Extended transpiler")
-    parser.add_argument("--nuke",
-                        action='store_true',
-                        help="Clean out the 'minified' directory")
 
-    parser.add_argument("--transpile-only",
-                        action="store_true",
-                        help="Only perform transpilation from .ks to .ksx, no further optimizations")
+    parser.add_argument(
+        "--nuke",
+        action='store_true',
+        help="Clean out the 'minified' directory")
+    parser.add_argument(
+        "--transpile-only",
+        action="store_true",
+        help="Only perform transpilation from .ks to .ksx, no further optimizations")
+    parser.add_argument(
+        "--safe",
+        action='store_true',
+        help=("Perform just a safe subset of the minification routines, "
+              "this will only use routines which have proven to be safe "
+              "in actual operation."))
+    parser.add_argument(
+        "--single-file",
+        help="Specify a single file to transpile")
+    parser.add_argument(
+        "--all-files",
+        action='store_true',
+        help="Transpile all .ks & .ksx files in the source directory")
 
-    parser.add_argument("--safe",
-                        action='store_true',
-                        help=("Perform just a safe subset of the minification routines, "
-                              "this will only use routines which have proven to be safe "
-                              "in actual operation."))
+    return parser
 
-    parser.add_argument("--single-file",
-                        help="Specify a single file to transpile")
 
-    parser.add_argument("--all-files",
-                        action='store_true',
-                        help="Transpile all .ks & .ksx files in the source directory")
-
-    args = parser.parse_args()
-
+def main(args):
     # the internal lists also set execution order for rules
     transpiler_actions = {
         "linewise": [
@@ -265,3 +269,7 @@ if __name__ == '__main__':
             transpile_only=args.transpile_only,
             safe_only=args.safe,
         )
+
+if __name__ == '__main__':
+    main(main_generate_parser().parse_args())
+
