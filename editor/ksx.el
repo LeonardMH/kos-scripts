@@ -385,18 +385,14 @@
   (setq-local font-lock-defaults '(ksx-font-locks nil t))
   (setq-local indent-line-function 'ksx-indent-line)
 
-  ; yes I know this is silly, but here it goes...
-  ;
-  ; prog-mode auto enables highlight-numbers mode, but highlight-numbers-mode is
-  ; subtly broken and does not recognized floating point numbers with its default regex
-  ;
-  ; that is one of the silliest design decisions I've ever seen, but here we
-  ; are, rather than trying to modify the default regex or add a ksx-mode
-  ; specific hash to highlight-numbers-mode, I'm just going to ensure it is
-  ; disabled and roll my own number highlighting
-  (if (featurep 'highlight-numbers) lambda()
-      ((highlight-numbers-mode)
-       (highlight-numbers-mode))))
+  ; highlight-numbers generic number regex does not account for floating point
+  ; numbers, and it overrides the regex that I defined above to highlight these
+  ; numbers, so I need to tell it that kOS supports these numbers...
+  (if (featurep 'highlight-numbers)
+      (puthash
+       'ksx-mode
+       (rx (and symbol-start (or (and (+ digit) (? (and "." (* digit))))) symbol-end))
+       highlight-numbers-modelist)))
 
 (add-to-list 'auto-mode-alist '("\\.\\(ks\\|ksx\\)\\'" . ksx-mode))
 
