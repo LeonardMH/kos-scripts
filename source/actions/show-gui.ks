@@ -10,11 +10,10 @@ function execute_action {
 
   if addons:rt:hasconnection(ship) {
     copypath("0:/actions/" + action + ".ks", "").
-    compile action.
-    deletepath("1:/" + action + ".ks").
     runpath(action).
+
     set isProcessing to false.
-    deletepath("1:/" + action + ".ksm").
+    deletepath("1:/" + action + ".ks").
   }
 }
 

@@ -5,7 +5,6 @@
 
 if addons:rt:hasconnection(ship) and not volume(1):exists("bootstrap") {
   copypath("0:/lib/bootstrap", "").
-  compile bootstrap. deletepath("1:/bootstrap.ks").
 }
 
 runpath("1:/bootstrap").
@@ -18,6 +17,5 @@ runpath("1:/bootstrap").
 // that doesn't boot directly to the GUI
 if addons:rt:hasconnection(ship) {
   copypath("0:/actions/show-gui.ks", "").
-  compile "show-gui". deletepath("1:/show-gui.ks").
   runpath("show-gui").
 }

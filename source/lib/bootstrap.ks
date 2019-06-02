@@ -3,7 +3,6 @@
 for lib in list("fileop", "ui") {
   if not (defined _LOADED_BOOTSTRAP) and addons:rt:hasconnection(ship) {
     copypath("0:/lib/" + lib, "").
-    compile lib. deletepath("1:/" + lib + ".ks").
   }
 
   runoncepath(lib).

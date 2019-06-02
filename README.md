@@ -114,11 +114,10 @@ make minify-all-safe
 ```
 
 You may be wondering, why not just [compile the .ks files into
-.ksm][doc-compile-ksm] and I have two responses to that. (1) I am currently
-doing that and (2) that has *a lot* of overhead. In some cases the .ksm files I
-am ending up with are actually larger than the .ks files that I started with,
-and at least in what I have seen so far the .ksm files are always larger than my
-minified files as well.
+.ksm][doc-compile-ksm] and I have one responses to that I tried doing it and it
+has *a lot* of overhead. In some cases the .ksm files I would end up with would
+actually be larger than the .ks files that I started with, and at least in what
+I have seen so far the .ksm files are always larger than my minified files.
 
 Currently, only the minify-all-safe option is safe to use. With the more
 aggressive minify-all target some scripts work (those that do not declare

@@ -4,7 +4,6 @@
 
 if addons:rt:hasconnection(ship) and not volume(1):exists("bootstrap") {
   copypath("0:/lib/bootstrap", "").
-  compile bootstrap. deletepath("1:/bootstrap.ks").
 }
 
 runpath("1:/bootstrap").
