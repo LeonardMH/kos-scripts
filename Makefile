@@ -6,6 +6,8 @@ KOS_SOURCE_DIR := ${KOS_SCRIPT_BASEDIR}/source
 KOS_MINIFY_DIR := ${KOS_SCRIPT_BASEDIR}/minified
 KOS_SCRIPT_DIR := ${KOS_MINIFY_DIR}
 
+KSX_INCLUDES := -I source/
+
 PYTHON := python3
 
 telnet:
@@ -30,21 +32,21 @@ report-size-single-file: guard-FILE
 
 transpile-only-all:
 	@echo "Transpiling all source files, no optimizations..."
-	@${PYTHON} ksx.py --nuke --transpile-only --all-files
+	@${PYTHON} ksx.py --nuke --transpile-only --all-files ${KSX_INCLUDES}
 
 	@make report-size
 	@make link
 
 compile-all:
 	@echo "Compiling all source files..."
-	@${PYTHON} ksx.py --nuke --all-files
+	@${PYTHON} ksx.py --nuke --all-files ${KSX_INCLUDES}
 
 	@make report-size
 	@make link
 
 compile-all-safe:
 	@echo "Compiling all source files safely..."
-	@${PYTHON} ksx.py --nuke --safe --all-files
+	@${PYTHON} ksx.py --nuke --safe --all-files ${KSX_INCLUDES}
 
 	@make report-size
 	@make link
