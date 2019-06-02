@@ -257,6 +257,8 @@ if __name__ == '__main__':
         files_to_compile = [args.single_file]
     elif args.all_files:
         files_to_compile = find_all_ks_files("./source/")
+    else:
+        files_to_compile = []
 
     for single_file in files_to_compile:
         compile_single_file(
