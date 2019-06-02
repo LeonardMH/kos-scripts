@@ -1,4 +1,4 @@
-;;; ksx -- Major mode for Kerboscript Extended.  -*- lexical-binding: t; -*-
+;;; ksx -- Major mode for KerboScript Extended.  -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;; Code:
 
@@ -45,21 +45,23 @@
         "reboot" "remove" "rename" "return" "run" "set" "shutdown" "stage"
         "step" "switch" "then" "to" "toggle" "unlock" "unset" "until" "volume"
         "wait" "when" "writejson")
-  "List of Kerboscript keywords for ksx-mode.")
+  "List of KerboScript keywords for ksx-mode.")
+
+(defvar ksx-lang-keywords (list "executed" "from" "import"))
 
 (defvar ksx-types
   (list  "sas" "steering" "throttle" "gear" "legs" "chutes" "lights" "panels" "brakes" "abort" "ag")
-  "List of special Kerboscript types for ksx-mode.")
+  "List of special KerboScript types for ksx-mode.")
 
 (defvar ksx-builtins
   (list "abs" "arccos" "arcsin" "arctan" "arctan2" "ceiling" "constant" "cos"
         "floor" "heading" "ln" "log10" "max" "min" "mod" "node" "random" "round"
         "sin" "sort" "tan")
-  "List of Kerboscript built-in functions for ksx-mode.")
+  "List of KerboScript built-in functions for ksx-mode.")
 
 (defvar ksx-constants
   (list "false" "true" "red" "green" "blue" "yellow" "cyan" "magenta" "purple" "white" "black")
-  "List of Kerboscript constants for ksx-mode.")
+  "List of KerboScript constants for ksx-mode.")
 
 (let
     ((top-level-suffixable (list "addons"))
@@ -122,7 +124,7 @@
                   vessel-suffixes
                   vessel-control-suffixes
                   vector-suffixes))
-    "List of known Kerboscript variables and structure suffixes for ksx-mode."))
+    "List of known KerboScript variables and structure suffixes for ksx-mode."))
 
 (defun ksx-regexp-opt (keywords)
   "Make an optimized regexp from the list of KEYWORDS."
@@ -133,7 +135,8 @@
   (concat "\\(?:^\\|[^:]\\)" (ksx-regexp-opt keywords)))
 
 (defvar ksx-font-locks
-  `(( "\\(@lazyglobal\\|@import\\|@from\\|import\\)" . (1 font-lock-warning-face))
+  `(( "\\(@lazyglobal\\|@ksx\\)" . (1 font-lock-warning-face))
+    ( ,(ksx-regexp-opt ksx-lang-keywords) . font-lock-preprocessor-face)
     ( "function \\([^ ]*\\)"          . (1 font-lock-function-name-face))
     ( "\\b[[:digit:].]+\\(e[+-]?[:digit:]+\\)?\\b" . font-lock-constant-face)
     ; Uncomment to highlight function calls
@@ -153,13 +156,13 @@
     (looking-at "[[:space:]]*\\(//.*\\)?$")))
 
 (defun ksx-previous-indentation ()
-  "Get the indentation of the previous significant line of Kerboscript."
+  "Get the indentation of the previous significant line of KerboScript"
   (save-excursion
     (ksx-backward-significant-line)
     (current-indentation)))
 
 (defun ksx-backward-significant-line ()
-  "Move backwards to the last non-blank, non-comment line of Kerboscript."
+  "Move backwards to the last non-blank, non-comment line of KerboScript"
   (interactive)
   (forward-line -1)
   (while (and (ksx-blank-line-p)
@@ -168,7 +171,7 @@
   (current-indentation))
 
 (defun ksx-unterminated-line-p ()
-  "Is the current line of Kerboscript unterminated?"
+  "Is the current line of KerboScript unterminated?"
   (save-excursion
     (beginning-of-line)
     (if (ksx-blank-line-p)
@@ -176,7 +179,7 @@
       (not (ksx-looking-at ".*[.{}]")))))
 
 (defun ksx-unterminated-previous-line-p ()
-  "Is the previous line of Kerboscript unterminated?"
+  "Is the previous line of KerboScript unterminated?"
   (save-excursion
     (beginning-of-line)
     (if (bobp)
@@ -186,7 +189,7 @@
         (ksx-unterminated-line-p)))))
 
 (defun ksx-indent-buffer ()
-  "Indent the current buffer as Kerboscript."
+  "Indent the current buffer as KerboScript"
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -211,7 +214,7 @@
     (string-match regexp line)))
 
 (defun ksx-indent-line ()
-  "Indent a line of Kerboscript."
+  "Indent a line of KerboScript"
   (interactive)
   (let* ((target-line (thing-at-point 'line))
          (indentation (ksx-previous-indentation))
@@ -367,7 +370,7 @@
 
 ;;;###autoload
 (define-derived-mode ksx-mode prog-mode "KerboScript Extended"
-  "A major mode for editing Kerboscript files."
+  "A major mode for editing KerboScript files."
   :group 'ksx-mode
   :syntax-table ksx-mode-syntax-table
   ; allow wrapping comments

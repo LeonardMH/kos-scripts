@@ -11,50 +11,35 @@ PYTHON := python3
 telnet:
 	@telnet localhost 5410
 
-minify-all:
-	@echo "Minifying all source files..."
-	@${PYTHON} ksmin.py --nuke --all-files
+clean:
+	@cd minified && git clean -fxdq
 
+report-size:
 	@echo "Before minification..."
-	@wc -c source/**/*.ks
-
+	@wc -c source/**/*.{ks,ksx}
 	@echo "\n----\n"
-
 	@echo "After minification..."
 	@wc -c minified/**/*.ks
 
-	@make link
-
-minify-all-safe:
-	@echo "Minifying all source files safely..."
-	@${PYTHON} ksmin.py --nuke --safe --all-files
-
-	@echo "Before minification..."
-	@wc -c source/**/*.ks
-
-	@echo "\n----\n"
-
-	@echo "After minification..."
-	@wc -c minified/**/*.ks
-
-	@make link
-
-minify-single-file: guard-FILE
-	@${PYTHON} ksmin.py --nuke
-	@echo "Copying all source files as is to minified..."
-	@cp -r ${KOS_SOURCE_DIR}/* ${KOS_MINIFY_DIR}
-
-	@echo "Minifying only ${FILE}..."
-	@${PYTHON} ksmin.py --safe --single-file ./source/${FILE}
-
+report-size-single-file: guard-FILE
 	@echo "Before minification..."
 	@wc -c ./source/${FILE}
-
 	@echo "\n----\n"
-
 	@echo "After minification..."
 	@wc -c ./minified/${FILE}
 
+compile-all:
+	@echo "Compiling all source files..."
+	@${PYTHON} ksx.py --nuke --all-files
+
+	@make report-size
+	@make link
+
+compile-all-safe:
+	@echo "Compiling all source files safely..."
+	@${PYTHON} ksx.py --nuke --safe --all-files
+
+	@make report-size
 	@make link
 
 link:

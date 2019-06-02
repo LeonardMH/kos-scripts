@@ -1,3 +1,7 @@
+@ksx executed ("lib/ui"). // ensures lib/ui has been executed
+@ksx from ("lib/ui") import (notify). // inlines notify function
+@ksx import ("lib/ui"). // inlines entire lib/ui.ks file (then minifies it)
+
 // ----------------------------------------------------------------------------
 // functions
 // ----------------------------------------------------------------------------

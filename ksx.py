@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-"""A minification tool for KerboScript"""
+"""A transpilation and minification tool for KerboScript (Extended)"""
 
 # https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-list-of-lists
 flatten = lambda l: [item for sublist in l for item in sublist]
@@ -109,6 +109,10 @@ def min_remove_useless_space(file_oneline):
     return "".join(c for (i, c) in enumerate(file_oneline) if i not in remove_indices)
 
 
+def ksx_remove_lines(file_lines):
+    return (l for l in file_lines if not l.strip().startswith("@ksx"))
+
+
 def ensure_space_after_certain_statements(file_oneline):
     # `parameter` and `set` statements both require a space after their closing
     # period (or maybe before they start?)
@@ -122,6 +126,7 @@ _LINEWISE_MINIFIER_ACTIONS = [
     min_strip_comments,
     min_remove_whitespace,
     min_remove_blank_lines,
+    ksx_remove_lines,
 ]
 
 
@@ -146,7 +151,7 @@ def find_all_ks_files(root_folder):
         from os.path import join
 
         acc = []
-        for filename in (f for f in filenames if f.endswith(".ks")):
+        for filename in (f for f in filenames if (f.endswith(".ks") or f.endswith(".ksx"))):
             acc.append(join(dirpath, filename))
 
         return acc
@@ -183,12 +188,13 @@ def nuke_minified_directory():
     walkpath_with_action("./minified/", remove_if_not_whitelisted)
 
 
-def minify_single_file(file_path):
+def compile_single_file(file_path):
     import os
     import shutil
 
     basepath, basename = [f(file_path) for f in (os.path.dirname, os.path.basename)]
     root_no_source = os.path.join(*os.path.relpath(basepath).split('/')[1:])
+    basename = "{}.ks".format(os.path.splitext(basename)[0])
 
     # minified files must match directory structure of files in source, ensure directories exist
     dest_dir = os.path.join("./minified", root_no_source)
@@ -213,7 +219,7 @@ def minify_single_file(file_path):
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser("ksmin: KerboScript minifier")
+    parser = argparse.ArgumentParser("ksx: KerboScript Extended transpiler")
     parser.add_argument("--nuke",
                         action='store_true',
                         help="Clean out the 'minified' directory")
@@ -225,11 +231,11 @@ if __name__ == '__main__':
                               "in actual operation."))
 
     parser.add_argument("--single-file",
-                        help="Specify a single file to minify")
+                        help="Specify a single file to transpile")
 
     parser.add_argument("--all-files",
                         action='store_true',
-                        help="Minify all .ks files in the source directory")
+                        help="Transpile all .ks & .ksx files in the source directory")
 
     args = parser.parse_args()
 
@@ -237,11 +243,17 @@ if __name__ == '__main__':
         nuke_minified_directory()
 
     if args.safe:
-        _LINEWISE_MINIFIER_ACTIONS = [min_strip_comments, min_remove_blank_lines]
         _ONELINE_MINIFIER_ACTIONS = []
+        _LINEWISE_MINIFIER_ACTIONS = [
+            min_strip_comments,
+            min_remove_blank_lines,
+            ksx_remove_lines,
+        ]
 
     if args.single_file:
-        minify_single_file(args.single_file)
+        files_to_compile = [args.single_file]
     elif args.all_files:
-        for single_file in find_all_ks_files("./source/"):
-            minify_single_file(single_file)
+        files_to_compile = find_all_ks_files("./source/")
+
+    for single_file in files_to_compile:
+        compile_single_file(single_file)
