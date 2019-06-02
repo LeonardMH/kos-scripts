@@ -21,7 +21,7 @@ this folder there are a few subdirectories, outlined below.
 - *missions* - Typically a composition of 'actions' as well as glue logic to piece them together. Can also be arbitrary KerboScript to run.
 - *editor* - Editor specific files (for syntax highlighting)
 
-Also at the top level is the `minified` folder, which containes a mirror of
+Also at the top level is the `minified` folder, which contains a mirror of
 everything in the `source` folder, but in 'minified' form so that it takes up
 less disk space on the vessels. See the [Minification](#minification) section.
 When you clone this repository, this folder will not contain any .ks files, they
@@ -56,8 +56,8 @@ Primarily, I find myself concerned by the following things:
 
 This repository includes a tool `ksx.py` which is capable of transpiling .ksx
 files into pure KerboScript, as well as performing minification of pure
-KerboScript. The processes of [Transpilation][#transpilation] and
-[Minification][#minification] are detailed below.
+KerboScript. The processes of [Transpilation](#transpilation) and
+[Minification](#minification) are detailed below.
 
 ### Transpilation 
 
@@ -109,7 +109,8 @@ the allowance of the kOS grammar to crunch the source files. That is exactly
 what the `ksx.py` script does and there are companion targets in the Makefile
 to help with it.
 
-Primarily, you will want to compile all of the files:
+Primarily, you will want to compile all of the files (this will transpile any 
+ksx files to pure ks, and then minify):
 
 ```base
 make compile-all
@@ -213,7 +214,7 @@ somewhere (this example assumes `/emacs-custom/`) then add the following to your
 (require 'ksx)
 ```
 
-### Screenshot Highlighting Code
+## Screenshot Highlighting Code
 
 The screenshot shown above for demonstrating `ksx-mode` is highlighting the
 following code block.
