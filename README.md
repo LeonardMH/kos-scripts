@@ -15,7 +15,7 @@ All of the kOS code (KerboScript) is contained under the `source` folder. Within
 this folder there are a few subdirectories, outlined below.
 
 - *boot* - All of my bootloaders that can be executed whenever a kOSProcessor starts up, selectable in the VAB/SPH. See [Bootloaders](#bootloaders).
-- *leolib* - My personal library of KerboScript functions. Meant to be re-used across actions and missions.
+- *lib* - My personal library of KerboScript functions. Meant to be re-used across actions and missions.
 - *actions* - One-off activities that are meant to be generic across vessels and generally too complex to be contained in a library.
 - *missions* - Typically a composition of 'actions' as well as glue logic to piece them together. Can also be arbitrary KerboScript to run.
 - *editor* - Editor specific files (for syntax highlighting)
@@ -34,7 +34,7 @@ any further than that.
 
 There are three types of bootloaders supported.
 
-- *shell* - The simplest bootloader, just executes `lib_bootstrap` and opens the terminal window. 
+- *shell* - The simplest bootloader, just executes `bootstrap` and opens the terminal window. 
 - *beacon* - A fairly lightweight bootloader that bootstraps and then waits for update files to be pushed from mission control. Very much inspired by [Kerbal Space Programming][kerbal-space-programming].
   - This is my most commonly used bootloader
 - *gui* - A pretty heavy bootloader that opens up a custom graphical user interface (GUI). The intent is for this UI to be able to guess what you would want to do at any given time and only show the relevant options, allowing for configuration when necessary.
@@ -104,7 +104,7 @@ to help with it.
 Primarily, you will either want to minify a single file (for test purposes):
 
 ```bash
-make minify-single-file FILE=./source/leolib/lib_bootstrap.ks
+make minify-single-file FILE=./source/lib/bootstrap.ks
 ```
 
 Or you want to minify all of the files (so you can actually use them):

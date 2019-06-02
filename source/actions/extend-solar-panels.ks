@@ -1,5 +1,5 @@
-file_download("leolib/lib_spcontrol"). runoncepath("lib_spcontrol").
+file_download("lib/spcontrol"). runoncepath("spcontrol").
 
 solar_panel_extend().
 
-deletepath("lib_spcontrol").
+deletepath("spcontrol").

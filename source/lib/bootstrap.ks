@@ -1,8 +1,8 @@
 // if we have a connection to KSC and have not already copied over our
 // dependencies, do so now
-for lib in list("lib_fileop", "lib_ui") {
+for lib in list("fileop", "ui") {
   if not (defined _LOADED_BOOTSTRAP) and addons:rt:hasconnection(ship) {
-    copypath("0:/leolib/" + lib, "").
+    copypath("0:/lib/" + lib, "").
     compile lib. deletepath("1:/" + lib + ".ks").
   }
 

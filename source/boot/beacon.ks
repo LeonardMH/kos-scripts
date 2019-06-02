@@ -2,12 +2,12 @@
 // boot into 'beacon' mode, where we poll for update files from mission control
 //
 
-if addons:rt:hasconnection(ship) and not volume(1):exists("lib_bootstrap") {
-  copypath("0:/leolib/lib_bootstrap", "").
-  compile lib_bootstrap. deletepath("1:/lib_bootstrap.ks").
+if addons:rt:hasconnection(ship) and not volume(1):exists("bootstrap") {
+  copypath("0:/lib/bootstrap", "").
+  compile bootstrap. deletepath("1:/bootstrap.ks").
 }
 
-runpath("1:/lib_bootstrap").
+runpath("1:/bootstrap").
 
 function try_execute_update {
   parameter name.

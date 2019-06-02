@@ -3,12 +3,12 @@
 // drives all future actions
 //
 
-if addons:rt:hasconnection(ship) and not volume(1):exists("lib_bootstrap") {
-  copypath("0:/leolib/lib_bootstrap", "").
-  compile lib_bootstrap. deletepath("1:/lib_bootstrap.ks").
+if addons:rt:hasconnection(ship) and not volume(1):exists("bootstrap") {
+  copypath("0:/lib/bootstrap", "").
+  compile bootstrap. deletepath("1:/bootstrap.ks").
 }
 
-runpath("1:/lib_bootstrap").
+runpath("1:/bootstrap").
 
 // the control gui will not be defined here (because it is a pain to
 // develop/debug/refresh boot scripts) but will instead be defined as an
