@@ -9,8 +9,8 @@
 
 (defvar ksx-mode-syntax-table
   (let ((st (make-syntax-table)))
-    (modify-syntax-entry ?/ ". 124b" st)
-    (modify-syntax-entry ?\n "> b" st)
+    (modify-syntax-entry ?/ ". 124b" st) ;; start comment
+    (modify-syntax-entry ?\n "> b" st)   ;; newline ends comment
     st)
   "Syntax table for ksx-mode.")
 
@@ -138,9 +138,9 @@
     ( "\\b[[:digit:].]+\\(e[+-]?[:digit:]+\\)?\\b" . font-lock-constant-face)
     ; Uncomment to highlight function calls
     ; ( "\\(\\(\\sw\\|\\s_\\)*\\)("     . (1 font-lock-function-name-face))
-    ( ,(ksx-regexp-opt-nomember ksx-builtins)  . font-lock-builtin-face)
-    ( ,(ksx-regexp-opt-nomember ksx-keywords)  . font-lock-keyword-face)
-    ( ,(ksx-regexp-opt-nomember ksx-variables) . font-lock-variable-name-face)
+    ( ,(ksx-regexp-opt ksx-builtins)  . font-lock-builtin-face)
+    ( ,(ksx-regexp-opt ksx-keywords)  . font-lock-keyword-face)
+    ( ,(ksx-regexp-opt ksx-variables) . font-lock-variable-name-face)
     ( ,(ksx-regexp-opt ksx-types)     . font-lock-type-face)
     ( ,(ksx-regexp-opt ksx-constants) . font-lock-constant-face)))
 
