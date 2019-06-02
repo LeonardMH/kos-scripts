@@ -35,12 +35,17 @@ def min_remove_blank_lines(file_lines):
 
 
 def min_squash_to_oneline(file_lines):
-    return "".join(file_lines)
+    """Translate list of lines to a single line"""
+    return " ".join(file_lines)
 
 
 def min_remove_useless_space(file_oneline):
+    """Remove any extra spacing around things that don't have spacing requirements"""
     quote_chars = ["'", '"']
     operators = [",", "*", "/", "^", "+", "-"]
+
+    # bracketsen can also be reduced in the same way as operators are
+    operators += ["{", "}", "(", ")", "[", "]"]
 
     # iterate over each character of the line and track if we are inside a
     # string, if not we can remove any spaces surrounding this operator
@@ -111,14 +116,6 @@ def min_remove_useless_space(file_oneline):
 
 def ksx_remove_lines(file_lines):
     return (l for l in file_lines if not l.strip().startswith("@ksx"))
-
-
-def ensure_space_after_certain_statements(file_oneline):
-    # `parameter` and `set` statements both require a space after their closing
-    # period (or maybe before they start?)
-    #
-    # TODO: This isn't implemented, nor is it being used
-    pass
 
 
 def walkpath_with_action(path, action):
@@ -238,15 +235,16 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    # the internal lists also set execution order for rules
     transpiler_actions = {
-        "oneline": [
-            [min_remove_useless_space, []]
-        ],
         "linewise": [
             [min_strip_comments, ["safe"]],
-            [min_remove_blank_lines, ["safe"]],
             [min_remove_whitespace, []],
+            [min_remove_blank_lines, ["safe"]],
             [ksx_remove_lines, ["transpile-only", "safe"]]
+        ],
+        "oneline": [
+            [min_remove_useless_space, []]
         ],
     }
 
