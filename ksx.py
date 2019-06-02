@@ -10,6 +10,11 @@ class ImportFileNotFoundError(FileNotFoundError):
     pass
 
 
+class ImportNotFoundError(ImportError):
+    """Raised when a from import statement fails to find specified function in given files"""
+    pass
+
+
 def min_strip_comments(file_lines, *args, **kwargs):
     """Comments are only needed for weak Kerbals, remove them"""
     def comment_filter(line):
@@ -147,7 +152,6 @@ def ksx_expand_import(file_lines, include_files, *args, **kwargs):
     for l in file_lines:
         if line_has_ksx_directive(l) and l.split()[1].lower() == "import":
             stmt = parse_ksx_import_statement(l)
-            print(stmt)
             for imp_file_path in match_statement_to_include_files(stmt, include_files):
                 with open(imp_file_path, 'r') as imp_file:
                     acc = imp_file.readlines() + ["\n"] + acc
@@ -157,7 +161,88 @@ def ksx_expand_import(file_lines, include_files, *args, **kwargs):
     return acc
 
 
+def ksx_expand_from_import(file_lines, include_files, *args, **kwargs):
+    """Expand @ksx from (x) import (y) statements to function inlining"""
+    def parse_ksx_import_statement(line):
+        import re
+
+        import_match_re = re.compile(r"@ksx from \((.*)\) import \((.*)\).")
+        re.IGNORECASE = True
+
+        matches = import_match_re.match(line)
+
+        if matches:
+            files = [l.strip().replace('"', '').replace("'", '')
+                     for l in matches.group(1).split(',')]
+            functions = [l.strip().replace('"', '').replace("'", '')
+                         for l in matches.group(2).split(',')]
+
+            return files, functions
+        else:
+            return [], []
+
+    def match_statement_to_include_files(import_string, include_files):
+        # just doing a partial substring match, that's sufficient for my needs
+        # at the moment
+        acc = []
+        for imp in import_string:
+            for f in include_files:
+                if imp in f:
+                    acc.append(f)
+                    break
+
+        if acc: return acc
+        raise ImportFileNotFoundError("Could not match import statement to include path")
+
+    def function_from_file(file_lines, function_name):
+        function_start_index = None
+        closing_bracket_index = None
+        bracket_stack = 0
+
+        acc = []
+
+        for lineno, line in enumerate(file_lines):
+            if line.strip().startswith('function {} '.format(function_name)):
+                function_start_index = lineno
+
+            if function_start_index is not None:
+                acc.append(line)
+                bracket_stack += (line.count('{') - line.count('}'))
+
+                if closing_bracket_index is None and '}' in line and bracket_stack == 0:
+                    closing_bracket_index = lineno
+
+            if closing_bracket_index is not None:
+                return acc
+
+    def function_from_files(include_files, function_name):
+        for f in include_files:
+            with open(f, 'r') as fp:
+                fff = function_from_file(fp.readlines(), function_name)
+                if fff is not None:
+                    return fff
+
+    acc = []
+
+    for l in file_lines:
+        if line_has_ksx_directive(l) and l.split()[1].lower() == "from":
+            files, functions = parse_ksx_import_statement(l)
+            files = [match_statement_to_include_files(fp, include_files) for fp in files]
+            for func in functions:
+                func_from_files = function_from_files(include_files, func)
+                if func_from_files is None:
+                    msg = "Could not find {} in files {}".format(func, files)
+                    raise ImportNotFoundError(msg)
+
+                acc = func_from_files + ["\n"] + acc
+        else:
+            acc.append(l)
+
+    return acc
+
+
 def ksx_remove_lines(file_lines, *args, **kwargs):
+    """Remove any remaining @ksx lines, this is the last ksx rule executed"""
     return (l for l in file_lines if not l.strip().startswith("@ksx"))
 
 
@@ -219,12 +304,13 @@ def file_has_ksx_extension(file_path):
     return os.path.splitext(file_path)[1] == ".ksx"
 
 
-def line_has_ksx_directive(file_line):
-    return file_line.strip().startswith("@ksx")
+def line_has_ksx_directive(file_line, specifically=None):
+    return file_line.strip().startswith(
+        "@ksx" if specifically is None else "@ksx {}".format(specifically))
 
 
-def file_has_ksx_directive(file_lines):
-    return any(line_has_ksx_directive(l) for l in file_lines)
+def file_has_ksx_directive(file_lines, specifically=None):
+    return any(line_has_ksx_directive(l, specifically) for l in file_lines)
 
 
 def compile_single_file(file_path, minifier_actions,
@@ -319,6 +405,7 @@ def main(args):
     transpiler_actions = {
         "linewise": [
             [ksx_expand_import, ["transpile-only", "safe"]],
+            [ksx_expand_from_import, ["transpile-only", "safe"]],
             [ksx_remove_lines, ["transpile-only", "safe"]],
             [min_strip_comments, ["safe"]],
             [min_remove_whitespace, []],
