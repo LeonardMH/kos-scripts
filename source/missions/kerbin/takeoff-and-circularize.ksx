@@ -1,0 +1,17 @@
+// mission to takeoff from Kerbin and circularize
+set targetAP to 90000.
+
+clearscreen. print "Starting takeoff...".
+set action_name to "takeoff".
+copypath("0:/actions/" + action_name, ""). runpath(action_name, targetAP). deletepath(action_name).
+
+clearscreen. print "Takeoff routine complete, warping to AP...".
+kuniverse:timewarp:warpto(time:seconds + eta:apoapsis - 10).
+wait until ship:altitude >= targetAP - 100.
+
+clearscreen. print "Starting circularization routine...".
+set action_name to "circularize-at-current".
+copypath("0:/actions/" + action_name, ""). runpath(action_name). deletepath(action_name).
+
+// clean up any possible triggers that might be remaining
+reboot.

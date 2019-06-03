@@ -1,0 +1,35 @@
+// circularize the active vessel at its current altitude
+//
+// Pulled almost directly from this comment:
+// https://www.reddit.com/r/Kos/comments/77ecte/formula_for_circularization_into_kos/dolaodt?utm_source=share&utm_medium=web2x
+set ves to ship.
+set orb to ves:body.
+
+lock desired_obt_speed to sqrt(orb:mu / (ves:altitude + orb:radius)).
+lock desired_obt_vector to vxcl(-orb:position, ves:velocity:orbit):normalized.
+lock desired_obt_vel to desired_obt_vector * desired_obt_speed.
+lock correction_vector to desired_obt_vel - ves:velocity:orbit.
+
+lock steering to correction_vector.
+lock throttle to myThrottle.
+
+clearscreen.
+until (correction_vector:mag < 0.005)
+{
+  if vang(correction_vector, ves:facing:forevector) < 2 {
+    lock myThrottle to min(1, correction_vector:mag * ves:mass / ves:availablethrust).
+  } else {
+    // do not thrust until the ship has rotated to within 2 degrees of the target vector
+    lock myThrottle to 0.
+  }
+
+  // print some diagnostics info
+  print "V_correction: " + correction_vector at (0, 0).
+  print "mag(V_correction): " + correction_vector:mag at (0, 1).
+  print "desired_orbit_speed: " + desired_obt_speed at (0, 2).
+}
+
+// return everything to good state
+clearscreen.
+unlock throttle. unlock steering.
+set ves:control:pilotmainthrottle to 0.0.
