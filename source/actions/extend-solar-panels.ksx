@@ -1,0 +1,15 @@
+@ksx executed ("lib/ui").
+
+// download the solar panel control library
+file_download("lib/spcontrol"). runoncepath("spcontrol").
+
+// attempt to extend solar panels, getting a count of how many were extended
+set spCount to solar_panel_extend().
+
+if spCount > 0 {
+  notify(spCount + " solar panels extended...").
+} else {
+  notify("No solar panels found or custom actions groups not unlocked...").
+}
+
+deletepath("spcontrol").
