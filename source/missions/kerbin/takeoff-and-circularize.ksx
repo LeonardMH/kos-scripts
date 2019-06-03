@@ -1,17 +1,35 @@
 // mission to takeoff from Kerbin and circularize
 set targetAP to 90000.
 
+// -----------------------------------------------------------------------------
+// yes, I know the repeated copypath, runpath, deletepath lines below could be
+// pulled into a function, but I need to run some of the scripts with
+// parameters, and I don't know if I can easily make a function that accepts a
+// variable number of arguments
+// -----------------------------------------------------------------------------
+
+// PHASE: Takeoff
 clearscreen. print "Starting takeoff...".
 set action_name to "takeoff".
 copypath("0:/actions/" + action_name, ""). runpath(action_name, targetAP). deletepath(action_name).
 
+// PHASE: Coasting to AP
 clearscreen. print "Takeoff routine complete, warping to AP...".
-kuniverse:timewarp:warpto(time:seconds + eta:apoapsis - 10).
-wait until ship:altitude >= targetAP - 100.
+set warp_to_time to time:seconds + eta:apoapsis - 10.
+until ship:altitude >= targetAP - 100 {
+  kuniverse:timewarp:warpto(warp_to_time).
+  wait until true.
+}
 
+// ensure we have turned warp back off, this should have already happened, but
+// you can never be too safe w.r.t warping
+set kuniverse:timewarp:warp to 0.
+
+// PHASE: Circularizing at AP
 clearscreen. print "Starting circularization routine...".
 set action_name to "circularize-at-current".
 copypath("0:/actions/" + action_name, ""). runpath(action_name). deletepath(action_name).
 
-// clean up any possible triggers that might be remaining
-reboot.
+// tell the bootloader to reboot the vessel to clean up any pending triggers
+// that did not get executed
+set _BOOTLOADER_SHOULD_REBOOT to 1.

@@ -27,6 +27,9 @@ until (correction_vector:mag < 0.005)
   print "V_correction: " + correction_vector at (0, 0).
   print "mag(V_correction): " + correction_vector:mag at (0, 1).
   print "desired_orbit_speed: " + desired_obt_speed at (0, 2).
+
+  // wait a physics tick
+  wait until true.
 }
 
 // return everything to good state
