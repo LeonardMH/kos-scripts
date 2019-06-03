@@ -33,7 +33,7 @@ until false {
     try_execute_update("name-" + sid["name"] + "-update.ks", true).
     try_execute_update("guid-" + sid["guid"] + "-update.ks", false).
 
-    wait 1.
+    wait 0.5.
   }
 
   // wait for a startup file to get things rolling
@@ -49,6 +49,6 @@ until false {
   if not addons:rt:hasconnection(ship) {
     wait until addons:rt:hasconnection(ship).
   } else {
-    wait 8.
+    wait 0.5.
   }
 }
