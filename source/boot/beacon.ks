@@ -10,15 +10,9 @@ runpath("1:/bootstrap").
 
 function try_execute_update {
   parameter name.
-  parameter doDelete.
 
   if has_file(name, 0) {
-    if doDelete {
-      file_receive(name).
-    } else {
-      file_download(name).
-    }
-
+    file_receive(name).
     movepath("1:/" + name, "update.ks").
     run update.ks. deletepath("1:/update.ks").
   }
@@ -27,13 +21,15 @@ function try_execute_update {
 until false {
   // if there are new instructions for this ship at KSC then download those and execute
   if addons:rt:hasconnection(ship) {
-    notify("Checking for updates...").
+    notify("Checking for updates [uuid=" + core:tag + "]...").
 
-    try_execute_update("uuid-" + sid["uuid"] + "-update.ks", true).
-    try_execute_update("name-" + sid["name"] + "-update.ks", true).
-    try_execute_update("guid-" + sid["guid"] + "-update.ks", false).
+    try_execute_update("uuid-" + core:tag + "-update.ks").
+    try_execute_update("name-" + ship:name + "-update.ks").
 
-    wait 0.5.
+    // reboot if the update script requested it
+    if (defined _BOOTLOADER_SHOULD_REBOOT) {
+      reboot.
+    }
   }
 
   // wait for a startup file to get things rolling

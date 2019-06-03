@@ -1,0 +1,9 @@
+@ksx import ("lib/fileop", "lib/ui").
+
+// create/get id info for this ship
+if core:tag = "" {
+  set core:tag to ("" + round(random(), 14)):substring(2, 14).
+}
+
+// important that this is last
+set _LOADED_BOOTSTRAP to true.
