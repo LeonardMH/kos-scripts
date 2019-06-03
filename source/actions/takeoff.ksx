@@ -1,31 +1,24 @@
+@ksx executed ("lib/ui").
+@ksx import ("lib/telemetry").
+
+parameter targetAP to 90000.
+
 // ----------------------------------------------------------------------------
 // functions
 // ----------------------------------------------------------------------------
-function gravitational_acceleration {
-  // vessel to calculate this for (defaults to active ship)
-  parameter ves is ship.
-
-  // orbital body to calculate in relation to (defaults to body the selected
-  // vessel is currently orbiting)
-  parameter orb is ves:body.
-
-  set radius to orb:radius + orb:altitudeof(ves:position).
-  return orb:mu / (radius ^ 2).
-}
-
 function get_throttle_for_twr {
-  parameter targetTWR.
+  parameter tgt. // target TWR
   parameter ves is ship.
 
-  set g to gravitational_acceleration().
+  set maxTWR to tlm_twr_max().
 
   // if we haven't yet staged through to a thrust producing stage, keep the
   // throttle pinned
-  if ves:availablethrust = 0 {
+  if maxTWR = 0 {
     return 1.0.
   }
 
-  return targetTWR * ves:mass * g / ves:availablethrust.
+  return tgt / maxTWR.
 }
 
 function get_steering_for_state {
@@ -68,8 +61,6 @@ function get_payload_fairings {
 // ----------------------------------------------------------------------------
 // begin script
 // ----------------------------------------------------------------------------
-set TARGET_AP to 90000.
-
 // set inital throttle and directional controls
 set mySteer to heading(90, 90).
 set myThrot to 1.0.
@@ -108,8 +99,14 @@ if fars:length > 0 {
   }
 }
 
-until ship:apoapsis >= TARGET_AP {
+clearscreen.
+until ship:apoapsis >= targetAP {
   set potentialSteering to get_steering_for_state(ship).
+
+  print "TWR(cur): " + tlm_twr_cur() at (0, 0).
+  print "TWR(max): " + tlm_twr_max() at (0, 1).
+  print "tt(AP): " + eta:apoapsis at (0, 2).
+  print "tt(PE): " + eta:periapsis at (0, 3).
 
   if potentialSteering = 0 {
     unlock steering.
