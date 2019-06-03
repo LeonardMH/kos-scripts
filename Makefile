@@ -56,7 +56,6 @@ link:
 	@ln -sf ${KOS_MINIFY_DIR}/boot ${KSP_SCRIPT_DIR}
 	@ln -sf ${KOS_MINIFY_DIR}/actions ${KSP_SCRIPT_DIR}
 	@ln -sf ${KOS_MINIFY_DIR}/lib ${KSP_SCRIPT_DIR}
-	@ln -sf ${KOS_MINIFY_DIR}/kslib ${KSP_SCRIPT_DIR}
 
 push-action: guard-ACTION guard-TARGET
 	@make link
