@@ -1,5 +1,8 @@
 @ksx import ("lib/fileop", "lib/ui").
 
+// ensure all systems ready
+wait until ship:unpacked.
+
 // create/get id info for this ship
 if core:tag = "" {
   set core:tag to ("" + round(random(), 14)):substring(2, 14).
