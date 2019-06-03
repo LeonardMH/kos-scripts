@@ -39,12 +39,12 @@
 (defvar ksx-keywords
   (list "add" "all" "and" "at" "batch" "break" "cd" "clearscreen" "compile"
         "copy" "copypath" "create" "createdir" "declare" "delete" "deletepath"
-        "deploy" "do" "edit" "else" "eta" "exists" "file" "for" "from" "function"
-        "global" "if" "in" "is" "list" "local" "lock" "log" "movepath"
-        "not" "off" "or" "on" "open" "parameter" "preserve" "print" "readjson"
-        "reboot" "remove" "rename" "return" "run" "set" "shutdown" "stage"
-        "step" "switch" "then" "to" "toggle" "unlock" "unset" "until" "volume"
-        "wait" "when" "writejson")
+        "deploy" "do" "edit" "else" "eta" "exists" "file" "for" "from"
+        "function" "global" "if" "in" "is" "list" "local" "lock" "log"
+        "movepath" "not" "off" "or" "on" "open" "parameter" "preserve" "print"
+        "readjson" "reboot" "remove" "rename" "return" "run" "runpath" "set"
+        "shutdown" "stage" "step" "switch" "then" "to" "toggle" "unlock" "unset"
+        "until" "volume" "wait" "when" "writejson")
   "List of KerboScript keywords for ksx-mode.")
 
 (defvar ksx-lang-keywords (list "executed" "from" "import"))
@@ -64,7 +64,7 @@
   "List of KerboScript constants for ksx-mode.")
 
 (let
-    ((top-level-suffixable (list "addons"))
+    ((top-level-suffixable (list "addons" "kuniverse"))
      (addons-suffixes (list "rt" "kac"))
      (addons-rt-suffixes
       (list "available" "delay" "kscdelay" "antennahasconnection"
@@ -74,6 +74,7 @@
      (addons-kac-alarms-suffixes
       (list "id" "name" "action" "type" "notes" "remaining" "repeat"
             "repeatperiod" "originbody" "targetbody"))
+     (kuniverse-suffixes (list "timewarp" "warpto"))
      (orbit-suffixes
       (list "apoapsis" "argumentofperiapsis" "body" "eccentricity"
             "hasnextpatch" "inclination" "lan"
@@ -118,6 +119,7 @@
                   addons-rt-suffixes
                   addons-kac-suffixes
                   addons-kac-alarms-suffixes
+                  kuniverse-suffixes
                   orbit-suffixes
                   orbitable-suffixes
                   orbitable-velocity-suffixes
