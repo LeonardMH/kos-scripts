@@ -15,11 +15,11 @@ repository here](https://github.com/gisikw/ksprogramming).
 All of the kOS code (KerboScript) is contained under the `source` folder. Within
 this folder there are a few subdirectories, outlined below.
 
-- *boot* - All of my bootloaders that can be executed whenever a kOSProcessor starts up, selectable in the VAB/SPH. See [Bootloaders](#bootloaders).
-- *lib* - My personal library of KerboScript functions. Meant to be re-used across actions and missions.
-- *actions* - One-off activities that are meant to be generic across vessels and generally too complex to be contained in a library.
-- *missions* - Typically a composition of 'actions' as well as glue logic to piece them together. Can also be arbitrary KerboScript to run.
-- *editor* - Editor specific files (for syntax highlighting)
+- **boot** - All of my bootloaders that can be executed whenever a kOSProcessor starts up, selectable in the VAB/SPH. See [Bootloaders](#bootloaders).
+- **lib** - My personal library of KerboScript functions. Meant to be re-used across actions and missions.
+- **actions** - One-off activities that are meant to be generic across vessels and generally too complex to be contained in a library.
+- **missions** - Typically a composition of 'actions' as well as glue logic to piece them together. Can also be arbitrary KerboScript to run.
+- **editor** - Editor specific files (for syntax highlighting)
 
 Also at the top level is the `minified` folder, which contains a mirror of
 everything in the `source` folder, but in 'minified' form so that it takes up
@@ -112,8 +112,14 @@ to help with it.
 Primarily, you will want to compile all of the files (this will transpile any 
 ksx files to pure ks, and then minify):
 
-```base
+```bash
 make compile-all
+```
+
+Which is mostly equivalent to calling `ksx.py` directly in the following way:
+
+```
+python3 ksx.py --nuke --all-files --include=source/
 ```
 
 You may be wondering, why not just [compile the .ks files into .ksm][doc-compile-ksm]
@@ -176,8 +182,9 @@ Targeting](#beacon-update-file-targeting).
 
 ## Beacon Update File Targeting
 
-**TODO**: I will document this at some point, but I am considering an overhaul
-to this whole system pretty soon so I don't want to do that just now.
+**TODO**: I will document this at some point, ~~but I am considering an overhaul
+to this whole system pretty soon so I don't want to do that just now~~. This
+overhaul has now happened, I just need to get around to documenting it.
 
 ## Emacs Major Mode (ksx-mode)
 
