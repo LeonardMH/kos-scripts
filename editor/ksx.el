@@ -67,29 +67,33 @@
     ((top-level-suffixable (list "addons" "kuniverse"))
      (addons-suffixes (list "rt" "kac"))
      (addons-rt-suffixes
-      (list "available" "delay" "kscdelay" "antennahasconnection"
-            "hasconnection" "haskscconnection" "haslocalcontrol"
-            "groundstations"))
+      (list
+       "available" "delay" "kscdelay" "antennahasconnection" "hasconnection"
+       "haskscconnection" "haslocalcontrol" "groundstations"))
      (addons-kac-suffixes (list "available" "alarms"))
      (addons-kac-alarms-suffixes
-      (list "id" "name" "action" "type" "notes" "remaining" "repeat"
-            "repeatperiod" "originbody" "targetbody"))
+      (list
+       "id" "name" "action" "type" "notes" "remaining" "repeat" "repeatperiod"
+       "originbody" "targetbody"))
      (kuniverse-suffixes (list "timewarp" "warpto"))
      (orbit-suffixes
-      (list "apoapsis" "argumentofperiapsis" "body" "eccentricity"
-            "hasnextpatch" "inclination" "lan"
-            "longitudeofascendingnode" "meananomalyatepoch" "name"
-            "nextpatch" "periapsis" "period" "position"
-            "semimajoraxis" "semiminoraxis" "transition" "trueanomaly"
-            "velocity"))
+      (list
+       "apoapsis" "argumentofperiapsis" "body" "eccentricity" "hasnextpatch"
+       "inclination" "lan" "longitudeofascendingnode" "meananomalyatepoch"
+       "name" "nextpatch" "periapsis" "period" "position" "semimajoraxis"
+       "semiminoraxis" "transition" "trueanomaly" "velocity"))
      (orbitable-suffixes
-      (list "altitude" "apoapsis" "body" "direction" "distance"
-            "geoposition" "hasbody" "hasobt" "hasorbit" "latitude"
-            "longitude" "name" "north" "obt" "patches" "periapsis"
-            "position" "prograde" "retrograde" "ship" "srfprograde"
-            "srfretrograde" "the" "up" "velocity"))
+      (list
+       "altitude" "apoapsis" "body" "direction" "distance" "geoposition"
+       "hasbody" "hasobt" "hasorbit" "latitude" "longitude" "name" "north" "obt"
+       "patches" "periapsis" "position" "prograde" "retrograde" "ship"
+       "srfprograde" "srfretrograde" "the" "up" "velocity"))
      (orbitable-velocity-suffixes
       (list "orbit" "surface"))
+     (orbitable-body-suffixes
+      (list
+       "mass" "altitude" "altitudeof" "radius" "rotationperiod" "mu" "atm"
+       "geopositionof" "geopositionlatlng"))
      (vessel-suffixes
       (list
        "control" "bearing" "heading" "maxthrust" "maxthrustat" "availablethrust"
@@ -123,6 +127,7 @@
                   orbit-suffixes
                   orbitable-suffixes
                   orbitable-velocity-suffixes
+                  orbitable-body-suffixes
                   vessel-suffixes
                   vessel-control-suffixes
                   vector-suffixes))
