@@ -1,0 +1,20 @@
+function gravitational_acceleration {
+  // calculate the gravitational acceleration exterted on the particle body by
+  // primary body (considering the primary body as a point mass)
+  parameter ves is ship.
+  parameter orb is ves:body.
+
+  set rad to orb:radius + orb:altitudeof(ves:position).
+  return orb:mu / (radius ^ 2).
+}
+
+function gravitational_force {
+  // universal law of gravitation
+  //
+  // calculate the force exterted on the particle body by primary body
+  // (considering the primary body as a point mass)
+  parameter ves is ship.
+  parameter orb is ves:body.
+
+  return ves:mass * gravitational_acceleration(ves, orb).
+}

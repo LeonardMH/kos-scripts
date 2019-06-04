@@ -1,0 +1,15 @@
+@ksx from ("lib/physics") import (gravitational_acceleration).
+
+function tlm_twr_max {
+  // vessel to calculate this for (defaults to active ship)
+  parameter ves is ship.
+
+  return ves:availablethrust / (ves:mass * gravitational_acceleration(ves)).
+}
+
+function tlm_twr_cur {
+  // vessel to calculate this for (defaults to active ship)
+  parameter ves is ship.
+
+  return throttle * tlm_twr_max(ves).
+}
