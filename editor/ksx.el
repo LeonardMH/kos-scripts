@@ -47,7 +47,7 @@
         "until" "volume" "wait" "when" "writejson")
   "List of KerboScript keywords for ksx-mode.")
 
-(defvar ksx-lang-keywords (list "executed" "from" "import"))
+(defvar ksx-lang-keywords (list "executed" "depend" "from" "import"))
 
 (defvar ksx-types
   (list  "sas" "steering" "throttle" "gear" "legs" "chutes" "lights" "panels" "brakes" "abort" "ag")
