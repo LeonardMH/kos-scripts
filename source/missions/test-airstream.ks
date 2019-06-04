@@ -7,23 +7,13 @@
 //
 // - Alt: 55,000m to 61,000m
 // - Spd: 90m/s to 1050m/s
-function gravitational_acceleration {
-  // vessel to calculate this for (defaults to active ship)
-  parameter ves is ship.
-
-  // orbital body to calculate in relation to (defaults to body the selected
-  // vessel is currently orbiting)
-  parameter orb is ves:body.
-
-  set radius to orb:radius + orb:altitudeof(ves:position).
-  return orb:mu / (radius ^ 2).
-}
+@ksx from ("lib/physics") import (grav_accel).
 
 function get_throttle_for_twr {
   parameter targetTWR.
   parameter ves is ship.
 
-  set g to gravitational_acceleration().
+  set g to grav_accel().
 
   // if we haven't yet staged through to a thrust producing stage, keep the
   // throttle pinned

@@ -1,20 +1,56 @@
-function gravitational_acceleration {
-  // calculate the gravitational acceleration exterted on the particle body by
-  // primary body (considering the primary body as a point mass)
+// a pure physics library for composing more advanced manuevers and capturing
+// better telemetry
+
+function alt_from_point_mass {
+  // current altitude above a body when considering that body as a point mass
   parameter ves is ship.
   parameter orb is ves:body.
 
-  set rad to orb:radius + orb:altitudeof(ves:position).
+  return orb:radius + orb:altitudeof(ves:position).
+}
+
+// ----------------------------------------------------------------------------
+// Orbital Information from kOS
+//
+// https://ksp-kos.github.io/KOS/structures/orbits/orbit.html
+//
+// For reference, the following useful orbital properties are available off of
+// the ship:orbit structure:
+//
+// - apoapsis & periapsis - Obviously
+// - period - In seconds
+// - inclination - In degress
+// - eccentricity - A ratio of periapsis to apoapsis
+// - semimajoraxis & semiminoraxis
+//
+// There are also a couple of suffixes of which I'm not sure if they will be
+// useful or not (longitudeofascendingnode (or lan), argumentofperiapsis,
+// trueanomaly, meananomolyatepoch, epoch) but suspect that they will.
+// ----------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
+// GRAVITY
+// ----------------------------------------------------------------------------
+@ksx depend(alt_from_point_mass).
+function grav_accel {
+  // calculate the gravitational acceleration exterted on the particle body by
+  // the primary body (considering the primary body as a point mass)
+  parameter ves is ship.
+  parameter orb is ves:body.
+
+  local rad to alt_from_point_mass(ves, orb).
   return orb:mu / (radius ^ 2).
 }
 
-function gravitational_force {
+@ksx depend(grav_accel).
+function grav_force {
   // universal law of gravitation
   //
-  // calculate the force exterted on the particle body by primary body
+  // calculate the force exterted on the particle body by the primary body
   // (considering the primary body as a point mass)
   parameter ves is ship.
   parameter orb is ves:body.
 
-  return ves:mass * gravitational_acceleration(ves, orb).
+  return ves:mass * grav_accel(ves, orb).
+}
 }
