@@ -60,7 +60,7 @@ def test_gh_issue_4p0():
     text at the top of the compiled file.
     """
     assert_source_to_target(
-        "gh_issue_4_source.ksx",
+        "gh_issue_4p0_source.ksx",
         "gh_issue_4_target.ksx",
         transpile_only=True)
 
