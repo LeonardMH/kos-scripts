@@ -1,0 +1,5 @@
+function one { print "HI". }
+
+@ksx from ("pure_kerboscript") import (test_language_features).
+
+function two { print "HELLO". }

@@ -148,15 +148,18 @@ def ksx_expand_import(file_lines, include_files, *args, **kwargs):
         if acc: return acc
         raise ImportFileNotFoundError("Could not match import statement to include path")
 
-    acc = []
+    acc, lineno = [], 0
     for l in file_lines:
         if line_has_ksx_directive(l) and l.split()[1].lower() == "import":
             stmt = parse_ksx_import_statement(l)
             for imp_file_path in match_statement_to_include_files(stmt, include_files):
                 with open(imp_file_path, 'r') as imp_file:
-                    acc = imp_file.readlines() + ["\n"] + acc
+                    import_lines = imp_file.readlines()
+                    acc = acc[:lineno] + import_lines + acc[lineno:]
+                    lineno += len(import_lines)
         else:
             acc.append(l)
+            lineno += 1
 
     return acc
 
@@ -222,8 +225,7 @@ def ksx_expand_from_import(file_lines, include_files, *args, **kwargs):
                 if fff is not None:
                     return fff
 
-    acc = []
-
+    acc, lineno = [], 0
     for l in file_lines:
         if line_has_ksx_directive(l) and l.split()[1].lower() == "from":
             files, functions = parse_ksx_import_statement(l)
@@ -234,9 +236,11 @@ def ksx_expand_from_import(file_lines, include_files, *args, **kwargs):
                     msg = "Could not find {} in files {}".format(func, files)
                     raise ImportNotFoundError(msg)
 
-                acc = func_from_files + ["\n"] + acc
+                acc = acc[:lineno] + func_from_files + acc[lineno:]
+                lineno += len(func_from_files)
         else:
             acc.append(l)
+            lineno += 1
 
     return acc
 
@@ -316,7 +320,8 @@ def file_has_ksx_directive(file_lines, specifically=None):
 def compile_single_file_lines(file_lines, minifier_actions,
                               transpile_only=False,
                               safe_only=True,
-                              include_paths=None):
+                              include_paths=None,
+                              **kwargs):
     # include_paths needs to be a list of directories, if it is coming in with
     # the default value of None then there are no included dirs
     if include_paths is None:
@@ -351,13 +356,21 @@ def compile_single_file(file_path, minifier_actions, **kwargs):
     import os
     import shutil
 
+    file_path = os.path.abspath(file_path)
     basepath, basename = [f(file_path) for f in (os.path.dirname, os.path.basename)]
-    root_no_source = os.path.join(*os.path.relpath(basepath).split('/')[1:])
+    split_path = os.path.relpath(basepath).split('/')
+
+    if split_path[0] == "source":
+        root_no_source = os.path.join(*split_path[1:])
+    else:
+        root_no_source = os.path.join(*split_path)
+
     basename = "{}.ks".format(os.path.splitext(basename)[0])
 
     # minified files must match directory structure of files in source, ensure
     # directories exist
-    dest_dir = os.path.join("./minified", root_no_source)
+    target_dir_rel = kwargs.get('override_target', './minified')
+    dest_dir = os.path.join(target_dir_rel, root_no_source)
     dest_path = os.path.join(dest_dir, basename)
     os.makedirs(dest_dir, exist_ok=True)
 
@@ -406,22 +419,23 @@ def main_generate_parser():
     return parser
 
 
+TRANSPILER_ACTIONS = {
+    "linewise": [
+        [ksx_expand_import, ["transpile-only", "safe"]],
+        [ksx_expand_from_import, ["transpile-only", "safe"]],
+        [ksx_remove_lines, ["transpile-only", "safe"]],
+        [min_strip_comments, ["safe"]],
+        [min_remove_whitespace, []],
+        [min_remove_blank_lines, ["safe"]],
+    ],
+    "oneline": [
+        [min_remove_useless_space, []],
+    ],
+}
+
+
 def main(args):
     # the internal lists also set execution order for rules
-    transpiler_actions = {
-        "linewise": [
-            [ksx_expand_import, ["transpile-only", "safe"]],
-            [ksx_expand_from_import, ["transpile-only", "safe"]],
-            [ksx_remove_lines, ["transpile-only", "safe"]],
-            [min_strip_comments, ["safe"]],
-            [min_remove_whitespace, []],
-            [min_remove_blank_lines, ["safe"]],
-        ],
-        "oneline": [
-            [min_remove_useless_space, []],
-        ],
-    }
-
     if args.nuke:
         nuke_minified_directory()
 
@@ -435,7 +449,7 @@ def main(args):
     for single_file in files_to_compile:
         compile_single_file(
             single_file,
-            transpiler_actions,
+            TRANSPILER_ACTIONS,
             transpile_only=args.transpile_only,
             safe_only=args.safe,
             include_paths=flatten(args.include or []),
