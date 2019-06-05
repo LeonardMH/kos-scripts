@@ -10,8 +10,8 @@ KSX_INCLUDES := -I source/
 
 PYTHON := python3
 
-telnet:
-	@telnet localhost 5410
+test:
+	@pipenv run pytest
 
 clean:
 	@cd minified && git clean -fxdq
@@ -56,6 +56,9 @@ link:
 	@ln -sf ${KOS_MINIFY_DIR}/boot ${KSP_SCRIPT_DIR}
 	@ln -sf ${KOS_MINIFY_DIR}/actions ${KSP_SCRIPT_DIR}
 	@ln -sf ${KOS_MINIFY_DIR}/lib ${KSP_SCRIPT_DIR}
+
+telnet:
+	@telnet localhost 5410
 
 push-action: guard-ACTION guard-TARGET
 	@make link
