@@ -39,7 +39,7 @@ function grav_accel {
   parameter orb is ves:body.
 
   local rad to alt_from_point_mass(ves, orb).
-  return orb:mu / (radius ^ 2).
+  return orb:mu / (rad ^ 2).
 }
 
 @ksx depend(grav_accel).
