@@ -313,32 +313,16 @@ def file_has_ksx_directive(file_lines, specifically=None):
     return any(line_has_ksx_directive(l, specifically) for l in file_lines)
 
 
-def compile_single_file(file_path, minifier_actions,
-                        transpile_only=False,
-                        safe_only=True,
-                        include_paths=None):
-    import os
-    import shutil
-
+def compile_single_file_lines(file_lines, minifier_actions,
+                              transpile_only=False,
+                              safe_only=True,
+                              include_paths=None):
     # include_paths needs to be a list of directories, if it is coming in with
     # the default value of None then there are no included dirs
     if include_paths is None:
         include_paths = []
 
     include_files = flatten(find_all_ks_files(p) for p in include_paths)
-
-    basepath, basename = [f(file_path) for f in (os.path.dirname, os.path.basename)]
-    root_no_source = os.path.join(*os.path.relpath(basepath).split('/')[1:])
-    basename = "{}.ks".format(os.path.splitext(basename)[0])
-
-    # minified files must match directory structure of files in source, ensure
-    # directories exist
-    dest_dir = os.path.join("./minified", root_no_source)
-    dest_path = os.path.join(dest_dir, basename)
-    os.makedirs(dest_dir, exist_ok=True)
-
-    with open(file_path, 'r') as rf:
-        file_lines = rf.readlines()
 
     def allowed_filter(func, tags):
         return not (
@@ -359,6 +343,28 @@ def compile_single_file(file_path, minifier_actions,
             file_oneline = action_function(file_oneline)
     else:
         file_oneline = "".join(file_lines)
+
+    return file_oneline
+
+
+def compile_single_file(file_path, minifier_actions, **kwargs):
+    import os
+    import shutil
+
+    basepath, basename = [f(file_path) for f in (os.path.dirname, os.path.basename)]
+    root_no_source = os.path.join(*os.path.relpath(basepath).split('/')[1:])
+    basename = "{}.ks".format(os.path.splitext(basename)[0])
+
+    # minified files must match directory structure of files in source, ensure
+    # directories exist
+    dest_dir = os.path.join("./minified", root_no_source)
+    dest_path = os.path.join(dest_dir, basename)
+    os.makedirs(dest_dir, exist_ok=True)
+
+    with open(file_path, 'r') as rf:
+        file_lines = rf.readlines()
+
+    file_oneline = compile_single_file_lines(file_lines, minifier_actions, **kwargs)
 
     with open(dest_path, 'w') as wf:
         wf.write(file_oneline)
