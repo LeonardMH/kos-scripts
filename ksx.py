@@ -51,7 +51,7 @@ def min_squash_to_oneline(file_lines, *args, **kwargs):
 
 def min_remove_useless_space(file_oneline):
     """Remove any extra spacing around things that don't have spacing requirements"""
-    quote_chars = ["'", '"']
+    quote_chars = ['"']
     operators = [",", "*", "/", "^", "+", "-"]
 
     # bracketsen can also be reduced in the same way as operators are
@@ -61,39 +61,37 @@ def min_remove_useless_space(file_oneline):
     # string, if not we can remove any spaces surrounding this operator
     space_locations = []
     operator_locations = []
-    string_nest_depth = [0, []]
 
+    in_string = False
+    string_strides = []
     for i, char in enumerate(file_oneline):
         # if we found a string character, increase depth or decrease depending
         # on what we were expecting to find
         #
-        # this won't actually work if you have "'" or '"'
-        #
-        # both are valid strings, but won't parse correctly here, I don't think
-        # I have any strings like that at the moment, can deal with it when it
-        # happens
+        # this won't actually work if you have "'" or '"', but that's ok
+        # because KerboScript only supports double quotes for strings
         if char in quote_chars:
-            if string_nest_depth[0] and char != string_nest_depth[1][-1]:
-                string_nest_depth[0] = string_nest_depth[0] + 1
-                string_nest_depth[1].append(char)
-            elif string_nest_depth[0]:
-                string_nest_depth[0] = string_nest_depth[0] - 1
-                string_nest_depth[1].pop()
+            if not in_string:
+                # starting a string
+                string_strides.append([i])
+            else:
+                # closing a string
+                string_strides[-1].append(i)
+
+            in_string = not in_string
             continue
 
-        # save indices of space characters
-        if char == " " and not string_nest_depth[0]:
-            space_locations.append(i)
-            continue
-
-        # save indices of operator characters
-        if char in operators and not string_nest_depth[0]:
-            operator_locations.append(i)
-            continue
+    # flatten string stride ranges into a single list so we can check operator
+    # locations against that directly
+    in_string_indices = flatten(range(b, e + 1) for b, e in string_strides)
 
     # find strides where an operator is surrounded by spaces
     space_strides = []
     for op in operator_locations:
+        # don't mess with strings
+        if op in in_string_indices:
+            continue
+
         first_space, last_space = op, op
 
         # search forward for spaces
@@ -319,7 +317,7 @@ def file_has_ksx_directive(file_lines, specifically=None):
 
 def compile_single_file_lines(file_lines, minifier_actions,
                               transpile_only=False,
-                              safe_only=True,
+                              safe_only=False,
                               include_paths=None,
                               **kwargs):
     # include_paths needs to be a list of directories, if it is coming in with
