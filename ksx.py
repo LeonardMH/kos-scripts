@@ -250,7 +250,7 @@ def ksx_expand_from_import(file_lines, include_files, *args, **kwargs):
 
 def ksx_remove_lines(file_lines, *args, **kwargs):
     """Remove any no-effect @ksx directives"""
-    to_remove = ['ensure', 'executed']
+    to_remove = ['depend', 'executed']
     def line_filter(line):
         l = line.strip().lower()
         return l.startswith("@ksx") and l.split(' ')[1] in to_remove
