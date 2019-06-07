@@ -252,7 +252,7 @@ def ksx_remove_lines(file_lines, *args, **kwargs):
     """Remove any no-effect @ksx directives"""
     to_remove = ['ensure', 'executed']
     def line_filter(line):
-        l = line.strip()
+        l = line.strip().lower()
         return l.startswith("@ksx") and l.split(' ')[1] in to_remove
 
     return (f'{l.rstrip()}\n' for l in file_lines if not line_filter(l))
@@ -317,7 +317,7 @@ def file_has_ksx_extension(file_path):
 
 
 def line_has_ksx_directive(file_line, specifically=None):
-    return file_line.strip().startswith(
+    return file_line.lower().strip().startswith(
         "@ksx" if specifically is None else "@ksx {}".format(specifically))
 
 
