@@ -1,0 +1,235 @@
+// TODO: These should not actually be required, see kos-scripts issue #7
+@ksx from ("lib/physics") import (alt_from_point_mass).
+
+// TODO: See below comment:
+//
+// this is mostly the same as our regular takeoff, but there are a couple of
+// unique requirements here so I need to manually pull in some of the takeoff
+// code, should work to make this generic
+set targetAP to 90000.
+
+// BEGIN: takeoff.ksx
+clearscreen. print "Starting takeoff...".
+@ksx executed ("lib/ui").
+@ksx import ("lib/telemetry"). // yes, actually needed for math, not just reporting
+
+function get_throttle_for_twr {
+  parameter tgt. // target TWR
+  parameter ves is ship.
+
+  set maxTWR to tlm_twr_max().
+
+  // if we haven't yet staged through to a thrust producing stage, keep the
+  // throttle pinned
+  if maxTWR = 0 {
+    return 1.0.
+  }
+
+  return tgt / maxTWR.
+}
+
+function get_steering_for_state {
+  parameter vessel is ship.
+
+  set v to vessel:velocity:surface:mag.
+  set h to vessel:altitude.
+
+  if v < 50 {
+    return heading(90, 90).
+  } else if v >= 50 and v < 100 {
+    return heading(90, 85).
+  } else if v >= 300 and v < 600 {
+    return heading(90, 75).
+  } else if v >= 600 and v < 1000 {
+    return heading(90, 45).
+  } else if v >= 1000 and v < 1400 {
+    return heading(90, 30).
+  } else if v >= 1400 {
+    return heading(90, 25).
+  }
+
+  // unlock the steering controls
+  return 0.
+}
+
+// set inital throttle and directional controls
+set mySteer to heading(90, 90).
+set myThrot to 1.0.
+
+lock steering to mySteer.
+lock throttle to myThrot.
+
+// TODO:
+// - Reduce ablator to 50%, I have never used anywhere near the whole thing
+// - Remove the monopropellant from this vessel, I don't have any RCS engines
+// - Add launchpad checks for invalid vessel configurations like monoprop
+//   without RCS engine
+
+// NOTE:
+// set ncs to ship:partsnamedpattern("noseCone").
+//
+// ahh, shit, I actually want to find the stack separators connected to the
+// nosecones... that's a whole different thing
+//
+// can get the parent part with:
+//
+// set nc to ncs[0].
+// set par to nc:parent.
+//
+// which returns the PART that this part is connected to, since the nosecones
+// are connected directly I should check this for separators.
+//
+// I should just tag these separators with a 'eject-on-aero-exit' tag and
+// standardize on that, a totally generic solution would be HARD
+
+// TODO: I have name tagged the decouplers for all parts that I want to lose on
+// atmospheric exit as "eject-on-aero-exit"", this will let me simply decouple
+// all of these parts. I should (1) make this a standard practice, and (2)
+// extend this to other actions and maybe make it a bit more standard so I could
+// instead say, for example "on-kerbin-aeroexit-eject", which would allow me to
+// easily extend this syntax to other bodies and for other events.
+//
+// Actually I have renamed the parts as 'on-kerbin-aeroexit-eject'", I like it
+//
+// You can catch these with ship:partstagged("on-kerbin-aeroexit-eject")
+// decouple then with:
+// for d in ship:partstagged("on-kerbin-aeroexit-eject") {
+//   d:getmodule("moduleDecouple"):doevent("decouple").
+// }
+
+// CUSTOM: this vessel does use launch clamps, but has SRB + LFO 1st stage and
+// can keep itself from hitting the launchpad even if engines and launch clamps
+// are staged at the same time
+//
+// if is_clamped_to_ground() {
+//   notify("Staging through launch clamps...").
+//   stage. wait until stage:ready. stage.
+// }
+
+// TODO: This needs to account for the fact that the SRBs will burnout first,
+// and can be discarded, even though maxthrust will be non-zero at that point
+//
+// [ ] I need to find the name of these engines, or some reliable way I can tell
+// that they have been exhausted.
+when maxthrust = 0 then {
+  notify("Staging...").
+  stage. wait until stage:ready.
+  preserve.
+}
+
+when ship:altitude > 70000 then {
+  notify("Ejecting unnecessary weight...").
+  lock steering to "kill".
+  for d in ship:partstagged("on-kerbin-aeroexit-eject") {
+    d:getmodule("moduleDecouple"):doevent("decouple").
+  }
+  lock steering to mySteer.
+}
+
+// TODO: This vessel does not have any payload fairings, but there are nosecones
+// on the LFO tanks that are going to the Mun, the nosecones can be disposed of
+// once we leave the atmosphere
+//
+// [ ] I need to find the name of the fairings so that they can be ejected on
+// atmospheric exit, there are another set on the SRB's but those will already
+// be gone at this point
+//
+// set fars to get_payload_fairings().
+// if fars:length > 0 {
+//   when ship:altitude > 70000 then {
+//     notify("Ejecting payload fairings...").
+//
+//     lock steering to "kill".
+//
+//     for far in fars {
+//       far:getmodule("ModuleProceduralFairing"):doevent("deploy").
+//     }
+//
+//     lock steering to mySteer.
+//   }
+// }
+
+clearscreen.
+until ship:apoapsis >= targetAP {
+  set potentialSteering to get_steering_for_state(ship).
+
+  print "TWR(cur): " + tlm_twr_cur() at (0, 0).
+  print "TWR(max): " + tlm_twr_max() at (0, 1).
+  print "tt(AP): " + eta:apoapsis at (0, 2).
+  print "tt(PE): " + eta:periapsis at (0, 3).
+
+  if potentialSteering = 0 {
+    unlock steering.
+  } else {
+    set mySteer to potentialSteering.
+  }
+
+  // above a certain altitude there is no compelling reason to keep thrust TWR
+  // limited, pin it
+  if ship:altitude > 26000 {
+    set myThrot to 1.0.
+  } else {
+    set myThrot to get_throttle_for_twr(1.9).
+  }
+}
+
+notify("Target AP reached, returning control...").
+lock throttle to 0. set ship:control:pilotmainthrottle to 0.
+// END: takeoff.ksx
+
+// ============================================================================
+
+clearscreen. print "Takeoff routine complete, warping to AP...".
+set warp_to_time to time:seconds + eta:apoapsis - 10.
+until ship:altitude >= targetAP - 100 {
+  kuniverse:timewarp:warpto(warp_to_time).
+  wait until true.
+}
+
+// ensure we have turned warp back off, this should have already happened, but
+// you can never be too safe w.r.t warping
+set kuniverse:timewarp:warp to 0.
+
+// ============================================================================
+
+// BEGIN: circularize-at-current.ksx
+clearscreen. print "Starting circularization routine...".
+set ves to ship.
+set orb to ves:body.
+
+lock desired_obt_speed to sqrt(orb:mu / (ves:altitude + orb:radius)).
+lock desired_obt_vector to vxcl(-orb:position, ves:velocity:orbit):normalized.
+lock desired_obt_vel to desired_obt_vector * desired_obt_speed.
+lock correction_vector to desired_obt_vel - ves:velocity:orbit.
+
+lock steering to correction_vector.
+lock throttle to myThrottle.
+
+clearscreen.
+until (correction_vector:mag < 0.005)
+{
+  if vang(correction_vector, ves:facing:forevector) < 2 {
+    lock myThrottle to min(1, correction_vector:mag * ves:mass / ves:availablethrust).
+  } else {
+    // do not thrust until the ship has rotated to within 2 degrees of the target vector
+    lock myThrottle to 0.
+  }
+
+  // print some diagnostics info
+  print "V_correction: " + correction_vector at (0, 0).
+  print "mag(V_correction): " + correction_vector:mag at (0, 1).
+  print "desired_orbit_speed: " + desired_obt_speed at (0, 2).
+
+  // wait a physics tick
+  wait until true.
+}
+
+// return everything to good state
+clearscreen.
+unlock throttle. unlock steering.
+set ves:control:pilotmainthrottle to 0.0.
+// END: circularize-at-current.ksx
+
+// tell the bootloader to reboot the vessel to clean up any pending triggers
+// that did not get executed
+set _BOOTLOADER_SHOULD_REBOOT to 1.
