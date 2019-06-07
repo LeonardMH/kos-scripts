@@ -383,7 +383,6 @@ def compile_recursive_descent(file_lines, *args, **kwargs):
 
 def compile_single_file_lines(file_lines, minifier_actions,
                               transpile_only=False,
-                              safe_only=False,
                               include_paths=None,
                               **kwargs):
     # include_paths needs to be a list of directories, if it is coming in with
@@ -394,9 +393,7 @@ def compile_single_file_lines(file_lines, minifier_actions,
     include_files = flatten(find_all_ks_files(p) for p in include_paths)
 
     def allowed_filter(func, tags):
-        return not (
-            (safe_only and "safe" not in tags) or
-            (transpile_only and "transpile-only" not in tags))
+        return not (transpile_only and "transpile-only" not in tags)
 
     allowed_actions = {
         k: [x for x in v if allowed_filter(*x)]
@@ -474,12 +471,6 @@ def main_generate_parser():
         action="store_true",
         help="Only perform transpilation from .ks to .ksx, no further optimizations")
     parser.add_argument(
-        "--safe",
-        action='store_true',
-        help=("Perform just a safe subset of the minification routines, "
-              "this will only use routines which have proven to be safe "
-              "in actual operation."))
-    parser.add_argument(
         "--single-file",
         help="Specify a single file to transpile")
     parser.add_argument(
@@ -498,12 +489,12 @@ def main_generate_parser():
 
 TRANSPILER_ACTIONS = {
     "linewise": [
-        [ksx_expand_import, ["transpile-only", "safe"]],
-        [ksx_expand_from_import, ["transpile-only", "safe"]],
-        [ksx_remove_lines, ["transpile-only", "safe"]],
-        [min_strip_comments, ["minify-only", "safe"]],
+        [ksx_expand_import, ["transpile-only"]],
+        [ksx_expand_from_import, ["transpile-only"]],
+        [ksx_remove_lines, ["transpile-only"]],
+        [min_strip_comments, ["minify-only"]],
         [min_remove_whitespace, ["minify-only"]],
-        [min_remove_blank_lines, ["minify-only", "safe"]],
+        [min_remove_blank_lines, ["minify-only"]],
     ],
     "oneline": [
         [min_remove_useless_space, ["minify-only"]],
@@ -528,7 +519,6 @@ def main(args):
             single_file,
             TRANSPILER_ACTIONS,
             transpile_only=args.transpile_only,
-            safe_only=args.safe,
             include_paths=flatten(args.include or []),
         )
 

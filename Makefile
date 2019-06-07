@@ -44,13 +44,6 @@ compile-all:
 	@make report-size
 	@make link
 
-compile-all-safe:
-	@echo "Compiling all source files safely..."
-	@${PYTHON} ksx.py --nuke --safe --all-files ${KSX_INCLUDES}
-
-	@make report-size
-	@make link
-
 link:
 	@echo "Linking minified files into Ships/Script..."
 	@ln -sf ${KOS_MINIFY_DIR}/boot ${KSP_SCRIPT_DIR}
