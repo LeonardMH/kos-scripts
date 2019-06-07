@@ -1,0 +1,8 @@
+// this file imports another file
+@ksx import ("import_pure_kerboscript").
+
+function make_neg_assertion {
+  parameter testParam.
+
+  return testParam <> True.
+}

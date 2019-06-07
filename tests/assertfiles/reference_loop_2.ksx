@@ -1,0 +1,3 @@
+@ksx import ("reference_loop_1").
+
+print test_function().

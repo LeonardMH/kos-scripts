@@ -15,6 +15,11 @@ class ImportNotFoundError(ImportError):
     pass
 
 
+class CircularImportError(ImportError):
+    """Raised when the compiler detects that it is in a circular reference import loop"""
+    pass
+
+
 def min_strip_comments(file_lines, *args, **kwargs):
     """Comments are only needed for weak Kerbals, remove them"""
     def comment_filter(line):
@@ -244,8 +249,13 @@ def ksx_expand_from_import(file_lines, include_files, *args, **kwargs):
 
 
 def ksx_remove_lines(file_lines, *args, **kwargs):
-    """Remove any remaining @ksx lines, this is the last ksx rule executed"""
-    return (l for l in file_lines if not l.strip().startswith("@ksx"))
+    """Remove any no-effect @ksx directives"""
+    to_remove = ['ensure', 'executed']
+    def line_filter(line):
+        l = line.strip()
+        return l.startswith("@ksx") and l.split(' ')[1] in to_remove
+
+    return (f'{l.rstrip()}\n' for l in file_lines if not line_filter(l))
 
 
 def walkpath_with_action(path, action):
@@ -315,6 +325,62 @@ def file_has_ksx_directive(file_lines, specifically=None):
     return any(line_has_ksx_directive(l, specifically) for l in file_lines)
 
 
+def hash_file_contents(file_lines):
+    import hashlib
+    m = hashlib.sha256()
+
+    for line in file_lines:
+        m.update(line.encode('utf-8'))
+
+    return m.hexdigest()
+
+
+RECURSION_DESCENT_LIMIT = 6
+
+
+def compile_recursive_descent(file_lines, *args, **kwargs):
+    """Given a file and its lines, recursively compile until no ksx statements remain"""
+    visited_files = kwargs.get('visited_files', set())
+
+    # calculate a hash of the file_lines and check if we have already compiled
+    # this one
+    file_hash = hash_file_contents(file_lines)
+
+    if len(visited_files) > RECURSION_DESCENT_LIMIT:
+        msg = (
+            "Compiler appears to be in a circular reference loop, "
+            "this is currently non-recoverable and is a known issue.\n\n"
+            "See: https://github.com/LeonardMH/kos-scripts/issues/7 \n\n"
+            "In the meantime check your library for files which import a "
+            "file, where that file imports the original (A->B->A).\n\n"
+            "You might also attempt using the 'from x import y' syntax which "
+            "has slightly narrower scope."
+        )
+
+        raise CircularImportError(msg)
+
+    if file_hash in visited_files:
+        # we have already compiled this file, no need to do so again
+        return ""
+    else:
+        # we will now compile the file, mark that it has been visited
+        visited_files.add(file_hash)
+
+    # compile and split back out to individual lines
+    file_oneline = compile_single_file_lines(file_lines, *args, **kwargs)
+    file_lines = file_oneline.split('\n')
+
+    # if there are no more ksx directives in the lines compiled we are done,
+    # return the stringified compile result
+    if not file_has_ksx_directive(file_lines):
+        return file_oneline
+
+    # if there are still more ksx directives in the lines compiled so far, run
+    # again
+    kwargs['visited_files'] = visited_files
+    return compile_recursive_descent(file_lines, *args, **kwargs).rstrip() + '\n'
+
+
 def compile_single_file_lines(file_lines, minifier_actions,
                               transpile_only=False,
                               safe_only=False,
@@ -375,7 +441,20 @@ def compile_single_file(file_path, minifier_actions, **kwargs):
     with open(file_path, 'r') as rf:
         file_lines = rf.readlines()
 
-    file_oneline = compile_single_file_lines(file_lines, minifier_actions, **kwargs)
+    # ksx statement expansion needs to happen recursively, and is best handled
+    # by not performing other minification actions first
+    actual_transpile_only = kwargs.get('transpile_only', False)
+    kwargs['transpile_only'] = True
+    file_oneline = compile_recursive_descent(file_lines, minifier_actions, **kwargs)
+    kwargs['transpile_only'] = actual_transpile_only
+
+    # do a final pass with non-recursive compiler to perform minification (I
+    # suppose it could use the recursive version too?)
+    if not actual_transpile_only:
+        file_oneline = compile_single_file_lines(
+            file_oneline.split('\n'),
+            minifier_actions,
+            **kwargs)
 
     with open(dest_path, 'w') as wf:
         wf.write(file_oneline)
@@ -422,12 +501,12 @@ TRANSPILER_ACTIONS = {
         [ksx_expand_import, ["transpile-only", "safe"]],
         [ksx_expand_from_import, ["transpile-only", "safe"]],
         [ksx_remove_lines, ["transpile-only", "safe"]],
-        [min_strip_comments, ["safe"]],
-        [min_remove_whitespace, []],
-        [min_remove_blank_lines, ["safe"]],
+        [min_strip_comments, ["minify-only", "safe"]],
+        [min_remove_whitespace, ["minify-only"]],
+        [min_remove_blank_lines, ["minify-only", "safe"]],
     ],
     "oneline": [
-        [min_remove_useless_space, []],
+        [min_remove_useless_space, ["minify-only"]],
     ],
 }
 

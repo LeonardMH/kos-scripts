@@ -1,0 +1,8 @@
+@ksx import ("pure_kerboscript").
+
+// yes this is stupid, no I do not care
+function make_assertion {
+  parameter testParam.
+
+  return testParam = True.
+}
