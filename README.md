@@ -1,3 +1,7 @@
+> This repository was mainly an experimental project to learn more about creating domain-specific programming languages and creating Emacs Plugins.
+>
+> I am no longer playing KSP and don't plan to use this for anything or continue development in any way, but I think there were some cool ideas here and it was a good learning experience. Feel free to fork or use this for your own projects with no attribution requirements.
+
 # kos-scripts
 
 My scripts and supporting tools for the Kerbal Space Program (KSP) mod Kerbal
